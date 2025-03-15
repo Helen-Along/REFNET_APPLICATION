@@ -209,39 +209,64 @@ export function OrderDetailsModal({
                       )}`}
                     />
                   </View>
-                  <View className="mb-4 ">
-                    <H5 className="text-sm text-gray-600 mb-1">
-                      {"Payment Status"}
-                    </H5>
-                    <H5 className="text-base w-1/3 text-center text-green-900 p-2 px-4 bg-green-50 rounded-full">
-                      {productData.payment_status || "N/A"}
-                    </H5>
-                  </View>
                   <View className="flex-row w-full">
                     <View className="w-1/2">
-                        <DetailItem
-                          label="Delivery Address"
-                          value={productData.delivery_address || "N/A"}
-                        />
+                      <View className="mb-4">
+                        <H5 className="text-sm text-gray-600 mb-1">
+                          {"Payment Status"}
+                        </H5>
+                        <H5
+                          className={`${
+                            order.payment_status === "pending"
+                              ? "text-orange-900 bg-orange-50"
+                              : "text-green-900 bg-green-50"
+                          } w-32 text-base text-center capitalize p-2 px-4 rounded-full`}
+                        >
+                          {productData.payment_status || "N/A"}
+                        </H5>
+                      </View>
                     </View>
-                  <DetailItem
-                    label="Order Placed ON"
-                    value={`${formatDate(
-                      productData.created_at
-                    )} • ${formatTime(productData.created_at)}`}
-                  />
+                    <View className="mb-4 ">
+                      <H5 className="text-sm text-gray-600 mb-1">
+                        {"Approval Status"}
+                      </H5>
+                      <H5
+                        className={`${
+                          productData.finance_approval === "pending"
+                            ? "text-orange-900 bg-orange-50"
+                            : "text-green-900 bg-green-50"
+                        } text-base text-center capitalize p-2 px-4 rounded-full`}
+                      >
+                        {productData.finance_approval || "N/A"}
+                      </H5>
+                    </View>
+                  </View>
+
+                  <View className="flex-row w-full">
+                    <View className="w-1/2">
+                      <DetailItem
+                        label="Delivery Address"
+                        value={productData.delivery_address || "N/A"}
+                      />
+                    </View>
+                    <DetailItem
+                      label="Order Placed ON"
+                      value={`${formatDate(
+                        productData.created_at
+                      )} • ${formatTime(productData.created_at)}`}
+                    />
                   </View>
                   <View className="border-t-[1px] border-zinc-900 py-4">
                     <View className="flex-row items-center rounded-md w-full gap-2">
                       <Button
                         onPress={() => handleOrderDecline(order.order_id)}
-                        className="rounded-full w-auto border-2 border-slate-500 bg-transparent"
+                        className="rounded-full w-auto border-2 border-slate-500 disabled:opacity-40 bg-transparent"
                         size={"lg"}
                         variant="default"
                         disabled={updating}
                       >
                         <H4 className="text-lg text-slate-400">
-                          &larr; {updating ? "Updating" : "Cancel"}
+                          &larr; Cancel
                         </H4>
                       </Button>
                       <Button
