@@ -241,6 +241,8 @@ export default function Page() {
         return orders.filter((order) => order.finance_approval === "pending");
       case "approved":
         return orders.filter((order) => order.finance_approval === "approved");
+      case "declined":
+        return orders.filter((order) => order.finance_approval === "declined");
       default:
         return orders;
     }
@@ -418,39 +420,41 @@ export default function Page() {
             showsHorizontalScrollIndicator={false}
             className="flex-row gap-2"
           >
-            {["all-orders", "pending", "approved"].map((sort, index) => (
-              <TouchableOpacity
-                key={index}
-                className={`px-3 pb-2 border-b-2 flex-row items-center ${
-                  sortBy === sort ? "border-white" : "border-zinc-900"
-                }`}
-                onPress={() => setSortBy(sort)}
-              >
-                {sort === "all-orders" ? (
-                  <GalleryVerticalEnd
-                    size={16}
-                    color={sortBy === sort ? "#fff" : "#3f3f46"}
-                  />
-                ) : sort === "pending" ? (
-                  <ListTodo
-                    size={16}
-                    color={sortBy === sort ? "#fff" : "#3f3f46"}
-                  />
-                ) : (
-                  <ListChecks
-                    size={16}
-                    color={sortBy === sort ? "#fff" : "#3f3f46"}
-                  />
-                )}
-                <H4
-                  className={`capitalize text-lg px-2 ${
-                    sortBy === sort ? "text-white" : "text-zinc-700"
+            {["all-orders", "pending", "approved", "declined"].map(
+              (sort, index) => (
+                <TouchableOpacity
+                  key={index}
+                  className={`px-3 pb-2 border-b-2 flex-row items-center ${
+                    sortBy === sort ? "border-white" : "border-zinc-900"
                   }`}
+                  onPress={() => setSortBy(sort)}
                 >
-                  {sort.replace("-", " ")}
-                </H4>
-              </TouchableOpacity>
-            ))}
+                  {sort === "all-orders" ? (
+                    <GalleryVerticalEnd
+                      size={16}
+                      color={sortBy === sort ? "#fff" : "#3f3f46"}
+                    />
+                  ) : sort === "pending" ? (
+                    <ListTodo
+                      size={16}
+                      color={sortBy === sort ? "#fff" : "#3f3f46"}
+                    />
+                  ) : (
+                    <ListChecks
+                      size={16}
+                      color={sortBy === sort ? "#fff" : "#3f3f46"}
+                    />
+                  )}
+                  <H4
+                    className={`capitalize text-lg px-2 ${
+                      sortBy === sort ? "text-white" : "text-zinc-700"
+                    }`}
+                  >
+                    {sort.replace("-", " ")}
+                  </H4>
+                </TouchableOpacity>
+              )
+            )}
           </ScrollView>
         </View>
 
