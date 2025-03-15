@@ -60,6 +60,7 @@ export function AssignDriverModal({
   dispatchId,
   drivers,
   onAssign,
+  order
 }: {
   sheetTrigger: React.ReactNode;
   visible: boolean;
@@ -67,6 +68,7 @@ export function AssignDriverModal({
   dispatchId: any;
   drivers: any;
   onAssign: (DriverId: number) => void;
+  order: any;
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [productData, setProductData] = useState(product);
@@ -87,6 +89,11 @@ export function AssignDriverModal({
   }, []);
 
   const [newStock, setNewStock] = useState("");
+  const [orderId, setOrderID] = useState('')
+
+  useEffect(() => {
+    setOrderID(order.order_id)
+  }, [])
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [selectedDriver, setSelectedDriver] = useState<string>("");
@@ -101,7 +108,24 @@ export function AssignDriverModal({
       console.error("Error updating driver:", error);
     } else {
       console.log("Driver assigned successfully");
+      await updateOrderStatus(dispatchId);
     }
+  };
+
+  // Function to update the dispatch_status in the orders table
+  const updateOrderStatus = async (dispatchId: number) => {
+    const { data, error } = await supabase
+      .from("orders")
+      .update({ dispatch_status: "dispatched" })
+      .eq("order_id", orderId);
+
+    if (error) {
+      console.error("Error updating order status:", error);
+    } else {
+      console.log("Order status updated successfully");
+    }
+
+    return { data, error };
   };
 
   // Function to update the driver_id in the dispatches table

@@ -345,6 +345,7 @@ export default function Page({ navigation }: { navigation: any }) {
                               </H5>
                             </Button>
                           }
+                          order={item.order}
                           product={item.order.product}
                           dispatchId={item.dispatch_id}
                           visible={modalVisible && selectedOrderId === item.id}
