@@ -409,7 +409,8 @@ export async function fetchCustomerOrders(user_id: any) {
   const { data, error } = await supabase
     .from("orders")
     .select("*, products:product_id(*)")
-    .eq("user_id", user_id);
+    .eq("user_id", user_id)
+    .order("order_date", { ascending: false });
 
   if (error) {
     return `Error: ${error.message || JSON.stringify(error)}`;
