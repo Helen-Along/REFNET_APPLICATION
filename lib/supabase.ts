@@ -383,7 +383,8 @@ export async function fetchOrders() {
     .from("orders")
     .select(
       "*, users:user_id(full_name), products:product_id(*)"
-    );
+    )
+    .order('created_at', { ascending: false });
 
   if (error) {
     return `Error: ${error.message || JSON.stringify(error)}`;
@@ -721,7 +722,8 @@ export async function fetchUserRequestedServices(user_id: number) {
   const { data: repairs, error: repairsError } = await supabase
     .from("repairs")
     .select("*")
-    .eq("customer_id", user_id);
+    .eq("customer_id", user_id)
+    .order('created_at', { ascending: false });
 
   if (repairsError) {
     return `Error: ${repairsError.message || JSON.stringify(repairsError)}`;
