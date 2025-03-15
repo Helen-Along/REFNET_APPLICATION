@@ -209,7 +209,7 @@ export default function Page() {
         
         // Successful Mpesa payment
         displayNotification("Mpesa payment initiated successfully", "success");
-      } else if (paymentMethod === 'card') {
+      } else if (paymentMethod === 'credit_card') {
         // Validate card details
         if (!paymentInfo.cardNumber || !paymentInfo.expiryDate || 
             !paymentInfo.cvv || !paymentInfo.cardHolderName) {
@@ -482,9 +482,9 @@ const renderPaymentForm = () => (
     </View>
     <View className="flex-row gap-4">
       <Button
-        onPress={() => setPaymentMethod("card")}
+        onPress={() => setPaymentMethod("credit_card")}
         className={`rounded-full w-1/2 ${
-          paymentMethod === "card" ? "bg-green-500" : "bg-[#2c2c2c]"
+          paymentMethod === "credit_card" ? "bg-green-500" : "bg-[#2c2c2c]"
         }`}
       >
         <H5 className="text-white mt-[2px]">Card</H5>
@@ -498,7 +498,7 @@ const renderPaymentForm = () => (
         <H5 className="text-white mt-[2px]">Mpesa</H5>
       </Button>
     </View>
-    {paymentMethod === "card" ? (
+    {paymentMethod === "credit_card" ? (
       <View className="gap-6">
         <View className="gap-2">
           <H5>Name on Card</H5>
@@ -521,6 +521,7 @@ const renderPaymentForm = () => (
           <LiteCreditCardInput
             onChange={handleCreditCardChange}
             inputStyle={{
+              fontFamily: "Inter_400Regular",
               fontSize: 16,
               color: "#fff",
             }}
