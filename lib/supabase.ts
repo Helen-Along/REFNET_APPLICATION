@@ -648,14 +648,17 @@ export async function updateAssignedRepair(repair_id: number, technician_id: num
 export async function fetchDispatches() {
   const { data, error } = await supabase
     .from("dispatches")
-    .select(`
+    .select(
+      `
       *,
       users:user_id(full_name),
       order:order_id (
         *,
         product:products(*)
       )
-    `);
+    `
+    )
+    .order("created_at", { ascending: false });
 
   if (error) {
     return `Error: ${error.message || JSON.stringify(error)}`;
