@@ -233,7 +233,9 @@ export function OrderDetailsModal({
                       <H5
                         className={`${
                           productData.finance_approval === "pending"
-                            ? "text-orange-900 bg-orange-50"
+                            ? "text-orange-900 bg-orange-50" :
+                            productData.finance_approval === "declined"
+                            ? "text-red-900 bg-red-50"
                             : "text-green-900 bg-green-50"
                         } text-base text-center capitalize p-2 px-4 rounded-full`}
                       >
@@ -265,8 +267,8 @@ export function OrderDetailsModal({
                         variant="default"
                         disabled={updating}
                       >
-                        <H4 className="text-lg text-slate-400">
-                          &larr; Cancel
+                        <H4 className="text-lg text-slate-400 flex items-center justify-center">
+                          &#x2717; Cancel Order
                         </H4>
                       </Button>
                       <Button

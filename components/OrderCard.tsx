@@ -33,17 +33,27 @@ export const OrderCard = ({
             className={`p-2 px-4 rounded-bl-lg rounded-tr-lg flex-row items-center w-auto ${
               order.finance_approval === "pending"
                 ? "bg-orange-300"
+                : order.finance_approval === "declined"
+                ? "bg-red-300"
                 : "bg-green-300"
             }`}
           >
             <Clock
-              color={order.finance_approval === "pending" ? "#9a3412" : "#166534"}
+              color={
+                order.finance_approval === "pending"
+                  ? "#9a3412"
+                  : order.finance_approval === "declined"
+                  ? "#9a3412"
+                  : "#166534"
+              }
               size={14}
             />
             <H5
               className={`${
                 order.finance_approval === "pending"
                   ? "text-orange-900"
+                  : order.finance_approval === "declined"
+                  ? "text-red-900"
                   : "text-green-900"
               } ml-2 text-base capitalize`}
             >
