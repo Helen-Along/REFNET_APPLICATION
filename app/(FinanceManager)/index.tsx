@@ -8,7 +8,12 @@ import {
   Alert,
   RefreshControl,
 } from "react-native";
-import { checkUser, fetchAllFinancialRecords, supabase, updateFinanceStatus } from "~/lib/supabase";
+import {
+  checkUser,
+  fetchAllFinancialRecords,
+  updateFinanceStatus,
+} from "~/lib/supabase";
+import { supabase } from "~/lib/supabase";
 import { RepairCard } from "~/components/RepairCard";
 import { useEmail } from "../EmailContext";
 import { H1, H2, H3, H4, H5, P } from "~/components/ui/typography";
@@ -193,7 +198,8 @@ export default function Page() {
     try {
       const { data, error } = await supabase
         .from("orders")
-        .select("*, products:product_id(*), users:user_id(*)");
+        .select("*, products:product_id(*), users:user_id(*)")
+        .order("created_at", { ascending: false }); // Sort by newest first
 
       if (error) throw error;
       setOrders(data || []);

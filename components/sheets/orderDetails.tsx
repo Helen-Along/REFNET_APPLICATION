@@ -217,14 +217,20 @@ export function OrderDetailsModal({
                       {productData.payment_status || "N/A"}
                     </H5>
                   </View>
-                  <DetailItem
-                    label="Delivery Address"
-                    value={productData.delivery_address || "N/A"}
-                  />
+                  <View className="flex-row w-full">
+                    <View className="w-1/2">
+                        <DetailItem
+                          label="Delivery Address"
+                          value={productData.delivery_address || "N/A"}
+                        />
+                    </View>
                   <DetailItem
                     label="Order Placed ON"
-                    value={`${formatDate(productData.created_at)} • ${formatTime(productData.created_at)}`}
+                    value={`${formatDate(
+                      productData.created_at
+                    )} • ${formatTime(productData.created_at)}`}
                   />
+                  </View>
                   <View className="border-t-[1px] border-zinc-900 py-4">
                     <View className="flex-row items-center rounded-md w-full gap-2">
                       <Button

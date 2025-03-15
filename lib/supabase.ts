@@ -381,10 +381,8 @@ export async function fetchTechnicians() {
 export async function fetchOrders() {
   const { data, error } = await supabase
     .from("orders")
-    .select(
-      "*, users:user_id(full_name), products:product_id(*)"
-    )
-    .order('created_at', { ascending: false });
+    .select("*, users:user_id(full_name), products:product_id(*)")
+    .order("order_date", { ascending: false });
 
   if (error) {
     return `Error: ${error.message || JSON.stringify(error)}`;
