@@ -102,7 +102,7 @@ export function OrderDetailsModal({
       if (dispatchError) {
         displayNotification(dispatchError.message, "danger");
       } else {
-        const totalAmount = productData.price;
+        const totalAmount = productData.products.price;
         const { data: balanceData, error: balanceError } = await supabase
           .from("financial_records")
           .select("balance")
@@ -111,9 +111,11 @@ export function OrderDetailsModal({
           .single();
 
         if (balanceError) {
+          console.log("Error fetching balance: ", balanceError)
           displayNotification(balanceError.message, "danger");
         } else {
           const newBalance = (balanceData.balance || 0) + totalAmount;
+          console.log("New Balance is: ", balanceData.balance);
           const { error: insertError } = await supabase
             .from("financial_records")
             .insert([
