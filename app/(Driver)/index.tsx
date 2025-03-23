@@ -173,13 +173,13 @@ export default function Page() {
   const calculateStats = () => {
     const totalAssignments = filteredDispatches.length;
     const pending = filteredDispatches.filter(
-      (d) => d.status === "Pending"
+      (d) => d.driver_status === "pending"
     ).length;
     const delivered = filteredDispatches.filter(
-      (d) => d.status === "Delivered"
+      (d) => d.driver_status === "delivered"
     ).length;
     const inTransit = filteredDispatches.filter(
-      (d) => d.status === "In Transit"
+      (d) => d.driver_status === "accepted"
     ).length;
 
     return [
