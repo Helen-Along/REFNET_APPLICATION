@@ -20,7 +20,18 @@ export const DispatchCard: React.FC<DispatchCardProps> = ({ dispatch, onViewDeta
       const { data, error } = await supabase
         .from("dispatches")
         .update({ status: "complete", driver_status: "delivered" })
-        .eq("order_id", dispatch.order_id)
+        .eq("order_id", dispatch.order_id);
+
+      if (!error) {
+        const { error: orderError } = await supabase
+          .from("orders")
+          .update({ dispatch_status: "delivered" })
+          .eq("order_id", dispatch.order_id);
+
+        if (orderError) {
+          throw new Error(orderError.message);
+        }
+      }
       if (error) {
         displayNotification(
           `Error marking as complete: ${error.message}`,
