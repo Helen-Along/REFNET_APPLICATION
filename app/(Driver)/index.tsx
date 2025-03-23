@@ -125,7 +125,8 @@ export default function Page() {
     )
   `
       )
-      .eq("driver_id", user.user_id);
+      .eq("driver_id", user.user_id)
+      .order("created_at", { ascending: false });
 
     if (error) {
       setError(error.message);

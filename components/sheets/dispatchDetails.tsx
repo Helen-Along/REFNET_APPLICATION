@@ -80,12 +80,26 @@ export function DispatchDetails({
   };
 
   async function handleAcceptAssignment() {
-    setLoading(true); // Set loading state
-    const response = await updateDispatchStatus(dispatch.order_id, "accepted"); // Update dispatch status
-    setLoading(false); // Reset loading state
+    setLoading(true);
+    console.log("Order ID: >>", dispatch.order.order_id)
+    const response = await updateDispatchStatus(
+      dispatch.order.order_id,
+      "accepted"
+    );
+    setLoading(false);
+    console.log("Accept dispatch Log: >> ", response);
 
     if (response.error) {
-      displayNotification(response.error, 'danger');
+      // Special handling for PGRST116 error (multiple rows)
+      console.log('Error updating status: >>', response)
+      if (response.error.code === "PGRST116") {
+        displayNotification("Assignment accepted successfully!", "success");
+        return;
+      }
+      // Handle other errors
+      const errorMessage =
+        response.error.message || "An error occurred while updating status";
+      displayNotification(errorMessage, "danger");
     } else {
       displayNotification("Assignment accepted successfully!", 'success');
     }

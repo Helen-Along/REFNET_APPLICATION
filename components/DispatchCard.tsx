@@ -19,9 +19,8 @@ export const DispatchCard: React.FC<DispatchCardProps> = ({ dispatch, onViewDeta
     try {
       const { data, error } = await supabase
         .from("dispatches")
-        .update({ status: "complete" })
+        .update({ status: "complete", driver_status: "delivered" })
         .eq("order_id", dispatch.order_id)
-        .single();
       if (error) {
         displayNotification(
           `Error marking as complete: ${error.message}`,
@@ -70,7 +69,9 @@ export const DispatchCard: React.FC<DispatchCardProps> = ({ dispatch, onViewDeta
                 ? "bg-orange-300"
                 : dispatch.driver_status === "declined"
                 ? "bg-red-300"
-                : "bg-green-300"
+                : dispatch.driver_status === "delivered"
+                ? "bg-green-300"
+                : "bg-purple-300"
             }`}
           >
             <ListTodo
@@ -79,7 +80,9 @@ export const DispatchCard: React.FC<DispatchCardProps> = ({ dispatch, onViewDeta
                   ? "#9a3412"
                   : dispatch.driver_status === "declined"
                   ? "#7f1d1d"
-                  : "#166534"
+                  : dispatch.driver_status === "delivered"
+                  ? "#166534"
+                  : "#581c87"
               }`}
               size={19}
             />
@@ -89,7 +92,9 @@ export const DispatchCard: React.FC<DispatchCardProps> = ({ dispatch, onViewDeta
                   ? "text-orange-900"
                   : dispatch.driver_status === "declined"
                   ? "text-red-900"
-                  : "text-green-900"
+                  : dispatch.driver_status === "delivered"
+                  ? "text-green-900"
+                  : "text-purple-900"
               } ml-2 text-base capitalize`}
             >
               {dispatch.driver_status}
@@ -115,12 +120,15 @@ export const DispatchCard: React.FC<DispatchCardProps> = ({ dispatch, onViewDeta
         <Button
           disabled={
             dispatch.driver_status === "accepted" ||
-            dispatch.driver_status === "declined"
+            dispatch.driver_status === "declined" ||
+            dispatch.driver_status === "delivered"
           }
           className={`rounded-full border-black bg-transparent ${
             dispatch.driver_status === "accepted"
               ? "border-0 p-0"
               : dispatch.driver_status === "declined"
+              ? "border-0 p-0 px-2"
+              : dispatch.driver_status === "delivered"
               ? "border-0 p-0 px-2"
               : "border-2"
           } `}
@@ -133,6 +141,8 @@ export const DispatchCard: React.FC<DispatchCardProps> = ({ dispatch, onViewDeta
               ? formatDate(dispatch.updated_at)
               : dispatch.driver_status === "declined"
               ? "Declined"
+              : dispatch.driver_status === "delivered"
+              ? formatDate(dispatch.updated_at)
               : "Decline"}
           </H5>
         </Button>
@@ -142,6 +152,18 @@ export const DispatchCard: React.FC<DispatchCardProps> = ({ dispatch, onViewDeta
             size={"lg"}
             variant="default"
             onPress={markAsComplete}
+          >
+            <H5 className=" text-white disabled:text-black">
+              {"Mark as Complete"}
+            </H5>
+          </Button>
+        ) : dispatch.driver_status === "delivered" ? (
+          <Button
+            className="rounded-full flex-1 bg-green-800 disabled:bg-zinc-900"
+            size={"lg"}
+            variant="default"
+            onPress={markAsComplete}
+            disabled
           >
             <H5 className=" text-white disabled:text-black">
               {"Mark as Complete"}

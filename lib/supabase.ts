@@ -669,11 +669,17 @@ export async function fetchDispatches() {
 
 // Function to update dispatch status
 export async function updateDispatchStatus(orderId: number, driver_status: string) {
+  console.log("Order id: >>", orderId, "Driver Status: >>", driver_status);
   const { data, error } = await supabase
     .from("dispatches")
     .update({ driver_status })
-    .eq("order_id", orderId)
-    .single();
+    .eq("order_id", Number(orderId))
+    
+  if (error) {
+    console.error("No matching dispatch found for the given order ID:", orderId);
+  } else {
+    console.log("Dispatches data: >> ", data);
+  }
 
   return { data, error }; // Return data and error for handling
 }
