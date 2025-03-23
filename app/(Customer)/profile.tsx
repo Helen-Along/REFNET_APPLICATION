@@ -682,159 +682,180 @@ export default function Page() {
               {selectedOrder ? (
                 <View className="space-y-4">
                   <ScrollView className="bg-white p-2 h-full">
-                  <View>
-                    <Image
-                    source={{
-                      uri: selectedOrder.products.image_url.replace(
-                      /^http:\/\//i,
-                      "https://"
-                      ),
-                    }}
-                    className="w-full h-48 rounded-lg mb-4"
-                    />
-                    <DetailItem
-                    label="Name"
-                    value={selectedOrder.products.name}
-                    />
-                    <DetailItem
-                    label="Category"
-                    value={selectedOrder.products.category}
-                    />
-                    <DetailItem
-                    label="Description"
-                    value={selectedOrder.products.description}
-                    />
-                    <View className="flex-row w-full">
-                    <View className="w-1/2">
-                      <DetailItem
-                      label="Price"
-                      value={`${formatPrice(
-                        selectedOrder.products.price
-                      )}`}
+                    <View>
+                      <Image
+                        source={{
+                          uri: selectedOrder.products.image_url.replace(
+                            /^http:\/\//i,
+                            "https://"
+                          ),
+                        }}
+                        className="w-full h-48 rounded-lg mb-4"
                       />
-                    </View>
-                    <DetailItem
-                      label="Quantity Bought"
-                      value={
-                      selectedOrder.quantity &&
-                      selectedOrder.quantity.toString()
-                      }
-                    />
-                    </View>
-                    <View className="gap-2 w-full">
-                    <H5 className="text-sm text-gray-600">
-                      {"Delivery Status"}
-                    </H5>
-                    <View className="flex-row items-center justify-around">
-                      <View className="flex-row items-center gap-2">
-                      <View
-                        className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                        selectedOrder.dispatch_status === "pending"
-                          ? "bg-green-500"
-                          : "!bg-[#2c2c2c]"
-                        }`}
-                      >
-                        <P> 1 </P>
+                      <DetailItem
+                        label="Name"
+                        value={selectedOrder.products.name}
+                      />
+                      <DetailItem
+                        label="Category"
+                        value={selectedOrder.products.category}
+                      />
+                      <DetailItem
+                        label="Description"
+                        value={selectedOrder.products.description}
+                      />
+                      <View className="flex-row w-full">
+                        <View className="w-1/2">
+                          <DetailItem
+                            label="Price"
+                            value={`${formatPrice(
+                              selectedOrder.products.price
+                            )}`}
+                          />
+                        </View>
+                        <DetailItem
+                          label="Quantity Bought"
+                          value={
+                            selectedOrder.quantity &&
+                            selectedOrder.quantity.toString()
+                          }
+                        />
                       </View>
-                      <H4
-                        className={`text-lg capitalize ${
-                        selectedOrder.dispatch_status === "pending"
-                          ? "text-gray-900"
-                          : "text-gray-500"
-                        }`}
-                      >
-                        Verification
-                      </H4>
+                      <View className="gap-2 w-full">
+                        <H5 className="text-sm text-gray-600">
+                          {"Delivery Status"}
+                        </H5>
+                        <View className="flex-row items-center justify-around">
+                          <View className="flex-row items-center gap-2">
+                            <View
+                              className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                                selectedOrder.dispatch_status === "pending"
+                                  ? "bg-green-500"
+                                  : "!bg-[#2c2c2c]"
+                              }`}
+                            >
+                              <P> 1 </P>
+                            </View>
+                            <H4
+                              className={`text-lg capitalize ${
+                                selectedOrder.dispatch_status === "pending"
+                                  ? "text-gray-900"
+                                  : "text-gray-500"
+                              }`}
+                            >
+                              Verification
+                            </H4>
+                          </View>
+                          <View className="flex-row items-center gap-2">
+                            <View
+                              className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                                selectedOrder.dispatch_status === "dispatched"
+                                  ? "bg-green-500"
+                                  : "!bg-[#6b7280]"
+                              }`}
+                            >
+                              <P> 2 </P>
+                            </View>
+                            <H4
+                              className={`text-lg capitalize ${
+                                selectedOrder.dispatch_status === "dispatched"
+                                  ? "text-gray-900"
+                                  : "text-gray-500"
+                              }`}
+                            >
+                              In Transit
+                            </H4>
+                          </View>
+                          <View className="flex-row items-center gap-2">
+                            <View
+                              className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                                selectedOrder.dispatch_status === "delivered"
+                                  ? "bg-green-500"
+                                  : "!bg-[#6b7280]"
+                              }`}
+                            >
+                              <P> 3 </P>
+                            </View>
+                            <H4
+                              className={`text-lg capitalize ${
+                                selectedOrder.dispatch_status === "delivered"
+                                  ? "text-gray-900"
+                                  : "text-gray-500"
+                              }`}
+                            >
+                              Delivered
+                            </H4>
+                          </View>
+                        </View>
                       </View>
-                      <View className="flex-row items-center gap-2">
-                      <View
-                        className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                        selectedOrder.dispatch_status === "dispatched"
-                          ? "bg-green-500"
-                          : "!bg-[#6b7280]"
-                        }`}
-                      >
-                        <P> 2 </P>
-                      </View>
-                      <H4
-                        className={`text-lg capitalize ${
-                        selectedOrder.dispatch_status === "dispatched"
-                          ? "text-gray-900"
-                          : "text-gray-500"
-                        }`}
-                      >
-                        In Transit
-                      </H4>
-                      </View>
-                      <View className="flex-row items-center gap-2">
-                      <View
-                        className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                        selectedOrder.dispatch_status === "delivered"
-                          ? "bg-green-500"
-                          : "!bg-[#6b7280]"
-                        }`}
-                      >
-                        <P> 3 </P>
-                      </View>
-                      <H4
-                        className={`text-lg capitalize ${
-                        selectedOrder.dispatch_status === "delivered"
-                          ? "text-gray-900"
-                          : "text-gray-500"
-                        }`}
-                      >
-                        Delivered
-                      </H4>
+                      <View className="flex-row w-full items-center mt-6">
+                        <H5 className="text-sm text-gray-600 w-1/2">
+                          {"Total Price"}
+                        </H5>
+                        <H5 className="text-base text-gray-900 text-right flex-1">
+                          {formatPrice(selectedOrder.total_price)}
+                        </H5>
                       </View>
                     </View>
-                    </View>
-                    <View className="flex-row w-full items-center mt-6">
-                    <H5 className="text-sm text-gray-600 w-1/2">
-                      {"Total Price"}
-                    </H5>
-                    <H5 className="text-base text-gray-900 text-right flex-1">
-                      {formatPrice(selectedOrder.total_price)}
-                    </H5>
-                    </View>
-                  </View>
-                  {selectedOrder.trackingNumber && (
-                    <View className="bg-zinc-950 p-4 rounded-xl">
-                    <P className="text-zinc-500">Tracking Number</P>
-                    <P className="text-black">
-                      {selectedOrder.trackingNumber}
-                    </P>
-                    </View>
-                  )}
+                    {selectedOrder.trackingNumber && (
+                      <View className="bg-zinc-950 p-4 rounded-xl">
+                        <P className="text-zinc-500">Tracking Number</P>
+                        <P className="text-black">
+                          {selectedOrder.trackingNumber}
+                        </P>
+                      </View>
+                    )}
 
-                  {selectedOrder.status === "delivered" && (
-                    <Button
-                    variant="outline"
-                    className="mt-4"
-                    onPress={() =>
-                      handleInitiateReturn(selectedOrder.order_id)
-                    }
-                    >
-                    <P className="uppercase text-black">Initiate Return</P>
-                    </Button>
-                  )}
-                  <View className="flex-row gap-4 w-full justify-between mt-4">
-                    <Button
-                    className="rounded-full border-2 border-gray-500 bg-transparent"
-                    size={"lg"}
-                    variant="default"
-                    onPress={() => setSelectedOrder(null)}
-                    >
-                    <H5 className="text-black text-2xl">&larr;</H5>
-                    </Button>
-                    <Button
-                    onPress={() => handleViewReceipt(selectedOrder)}
-                    className="rounded-full flex-1 bg-green-700"
-                    size={"lg"}
-                    variant="default"
-                    >
-                    <H5 className="text-white">View Receipt</H5>
-                    </Button>
-                  </View>
+                    {selectedOrder.status === "delivered" && (
+                      <Button
+                        variant="outline"
+                        className="mt-4"
+                        onPress={() =>
+                          handleInitiateReturn(selectedOrder.order_id)
+                        }
+                      >
+                        <P className="uppercase text-black">Initiate Return</P>
+                      </Button>
+                    )}
+                    <View className="flex-row gap-4 w-full justify-between mt-4">
+                      <Button
+                        className="rounded-full border-2 border-gray-500 bg-transparent"
+                        size={"lg"}
+                        variant="default"
+                        onPress={() => setSelectedOrder(null)}
+                      >
+                        <H5 className="text-black text-2xl">&larr;</H5>
+                      </Button>
+                      <Button
+                        onPress={() => handleViewReceipt(selectedOrder)}
+                        className="rounded-full flex-1 bg-green-700"
+                        size={"lg"}
+                        variant="default"
+                      >
+                        <H5 className="text-white">View Receipt</H5>
+                      </Button>
+                    </View>
+                    <View className="flex-row gap-4 w-full justify-between mt-4">
+                      <Button
+                        onPress={() => handleViewReceipt(selectedOrder)}
+                        className="rounded-full border-2 border-gray-500 bg-transparent"
+                        size={"lg"}
+                        variant="default"
+                      >
+                        <H5 className="text-gray-600">Request for return</H5>
+                      </Button>
+                        <Button
+                        onPress={() => {
+                          setActiveModal("review");
+                          setSelectedProduct(selectedOrder);
+                        }}
+                        className="rounded-full flex-1 bg-green-700"
+                        size={"lg"}
+                        variant="default"
+                        >
+                        <H5 className="text-white">Review Order</H5>
+                        </Button>
+                    </View>
                   </ScrollView>
                 </View>
               ) : (
@@ -1112,7 +1133,7 @@ export default function Page() {
                             />
                           </View>
                           <View className="flex-row w-full gap-2 mt-6">
-                            {order.status === "delivered" ? (
+                            {order.dispatch_status === "delivered" ? (
                               <View className="w-1/2">
                                 <DetailItem
                                   label="Delivered On"
@@ -1126,16 +1147,16 @@ export default function Page() {
                                 </H5>
                                 <H5
                                   className={`text-base text-gray-900 capitalize p-2 px-4 ${
-                                    order.status === "pending"
+                                    order.dispatch_status === "pending"
                                       ? "bg-orange-300 text-orange-900"
                                       : "bg-green-300 text-green-900"
                                   }`}
                                 >
-                                  Delivery Status: {order.status}
+                                  Delivery Status: {order.dispatch_status}
                                 </H5>
                               </View>
                             )}
-                            {order.status === "delivered" ? (
+                            {order.dispatch_status === "delivered" ? (
                               <Button
                                 onPress={() => setSelectedProduct(order)}
                                 className="rounded-full flex-1 bg-green-700"
