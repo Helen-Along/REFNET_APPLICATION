@@ -684,6 +684,25 @@ export async function updateDispatchStatus(orderId: number, driver_status: strin
   return { data, error }; // Return data and error for handling
 }
 
+// Function to update dispatch status
+export async function updateOrderStatus(orderId: number, updatedOrder: any) {
+  const { data, error } = await supabase
+    .from("orders")
+    .update({ updatedOrder })
+    .eq("order_id", Number(orderId));
+
+  if (error) {
+    console.error(
+      "Error requesting for return for order:",
+      error
+    );
+  } else {
+    console.log("Error requesting for return", data);
+  }
+
+  return { data, error }; // Return data and error for handling
+}
+
 export const fetchServicesFromDB = async () => {
   const { data, error } = await supabase
     .from("services") // Replace 'services' with your actual table name

@@ -36,6 +36,7 @@ import {
   submitFeedback,
   fetchUserRequestedRepairs,
   fetchUserRequestedServices,
+  updateOrderStatus,
 } from "~/lib/supabase";
 import { formatPrice } from "~/lib/format-price";
 import displayNotification from "~/lib/Notification";
@@ -835,27 +836,58 @@ export default function Page() {
                         <H5 className="text-white">View Receipt</H5>
                       </Button>
                     </View>
-                    <View className="flex-row gap-4 w-full justify-between mt-4">
-                      <Button
-                        onPress={() => handleViewReceipt(selectedOrder)}
-                        className="rounded-full border-2 border-gray-500 bg-transparent"
-                        size={"lg"}
-                        variant="default"
-                      >
-                        <H5 className="text-gray-600">Request for return</H5>
-                      </Button>
+                    {selectedOrder.dispatch_status === "delivered" ? (
+                      <View className="flex-row gap-4 w-full justify-between mt-4">
                         <Button
-                        onPress={() => {
-                          setActiveModal("review");
-                          setSelectedProduct(selectedOrder);
-                        }}
-                        className="rounded-full flex-1 bg-green-700"
-                        size={"lg"}
-                        variant="default"
+                          onPress={async () => {
+                            try {
+                              const updatedOrder = {
+                                ...selectedOrder,
+                                status: "returned",
+                                dispatch_status: "returned",
+                              };
+                              // Assuming you have a function to update the order in the database
+                              await updateOrderStatus(
+                                selectedOrder.order_id,
+                                updatedOrder
+                              );
+                              displayNotification(
+                                "Return request submitted successfully",
+                                "success"
+                              );
+                              setSelectedOrder(updatedOrder);
+                            } catch (error) {
+                              console.error(
+                                "Error updating order status:",
+                                error
+                              );
+                              displayNotification(
+                                "Failed to submit return request",
+                                "error"
+                              );
+                            }
+                          }}
+                          className="rounded-full border-2 border-gray-500 bg-transparent"
+                          size={"lg"}
+                          variant="default"
                         >
-                        <H5 className="text-white">Review Order</H5>
+                          <H5 className="text-gray-600">Request for return</H5>
                         </Button>
-                    </View>
+                        <Button
+                          onPress={() => {
+                            setActiveModal("review");
+                            setSelectedProduct(selectedOrder);
+                          }}
+                          className="rounded-full flex-1 bg-green-700"
+                          size={"lg"}
+                          variant="default"
+                        >
+                          <H5 className="text-white">Review Order</H5>
+                        </Button>
+                      </View>
+                    ) : (
+                      ""
+                    )}
                   </ScrollView>
                 </View>
               ) : (
