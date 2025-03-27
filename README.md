@@ -134,7 +134,7 @@ For any questions or support, please contact us at support@refnet.com.
 
 ### Shipping Module
 - [ ] Categorize into pending and approved
-- [ ] Variable Delivery fees based on location
+- [x] Variable Delivery fees based on location
 
 ### Driver Module
 - [x] Accept assignment and mark as delivered
