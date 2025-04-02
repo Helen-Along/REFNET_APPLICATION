@@ -184,15 +184,15 @@ export function AssignMaterialsModal({
                 </View>
               ) : (
                 <>
-                  <Image
+                  {/* <Image
                     source={{
-                      uri: productData.image_url.replace(
+                      uri: productData?.image_url?.replace(
                         /^http:\/\//i,
                         "https://"
                       ),
                     }}
                     className="w-full h-48 rounded-lg mb-4"
-                  />
+                  /> */}
                   <DetailItem label="Name" value={productData.name} />
                   <DetailItem label="Category" value={productData.category} />
                   <H5 className="text-sm text-gray-600 mb-1">
