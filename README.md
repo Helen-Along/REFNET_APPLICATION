@@ -33,18 +33,21 @@ REFNET is a comprehensive application designed to manage various aspects of a re
 ### Installation
 
 1. **Clone the repository:**
+
    ```bash
    git clone https://github.com/yourusername/REFNET_APPLICATION.git
    cd REFNET_APPLICATION
    ```
 
 2. **Install dependencies:**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables:**
    Create a `.env` file in the root directory and add your Supabase URL and Anon Key:
+
    ```env
    EXPO_PUBLIC_SUPABASE_URL=your-supabase-url
    EXPO_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
@@ -118,6 +121,7 @@ For any questions or support, please contact us at support@refnet.com.
 ## Todo
 
 ### Customer Module
+
 - [x] Registration approved by admin
 - [x] Change state in checkout to country
 - [x] M-PESA as a payment method
@@ -129,16 +133,25 @@ For any questions or support, please contact us at support@refnet.com.
 - [ ] Product and Service review
 
 ### Database Module
+
 - [x] Use real world price for products
 - [x] Add more technicians
 
 ### Shipping Module
+
 - [ ] Categorize into pending and approved
 - [x] Variable Delivery fees based on location
 
 ### Driver Module
+
 - [x] Accept assignment and mark as delivered
 
 ### Finance module
+
 - [x] Remove service payment approval
 - [x] Should have all order details
+- [ ] Download receipt after order is delivered
+
+### Stock Manager Module
+- [ ] View orders and stock that has been reduced
+- [ ] Request from stock -> Finance approval -> Supplier -> Receipt
