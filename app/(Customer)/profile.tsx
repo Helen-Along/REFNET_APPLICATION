@@ -1038,12 +1038,15 @@ export default function Page() {
                           <H5 className="text-black text-2xl">&larr;</H5>
                         </Button>
                         <Button
-                          onPress={() => handleViewReceipt(selectedOrder)}
+                          onPress={() => {
+                            const orderReceipt = generateReceipt(selectedOrder, customer);
+                            downloadReceipt(orderReceipt);
+                          }}
                           className="rounded-full flex-1 bg-green-700"
                           size={"lg"}
                           variant="default"
                         >
-                          <H5 className="text-white">View Receipt</H5>
+                          <H5 className="text-white">Download Receipt</H5>
                         </Button>
                       </View>
                     )}

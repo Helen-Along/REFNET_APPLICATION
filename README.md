@@ -150,7 +150,7 @@ For any questions or support, please contact us at support@refnet.com.
 
 - [x] Remove service payment approval
 - [x] Should have all order details
-- [ ] Download receipt after order is delivered
+- [x] Download receipt after order is delivered
 
 ### Stock Manager Module
 - [ ] View orders and stock that has been reduced
