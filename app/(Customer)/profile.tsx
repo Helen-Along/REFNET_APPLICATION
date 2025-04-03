@@ -49,6 +49,7 @@ import { Services } from "~/components/sheets/manage/services";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
 import * as Print from "expo-print";
+import { formatTime } from "~/lib/format-time";
 
 interface customer {
   full_name: string;
@@ -818,24 +819,26 @@ export default function Page() {
                         <P className="uppercase text-black">Initiate Return</P>
                       </Button>
                     )}
-                    <View className="flex-row gap-4 w-full justify-between mt-4">
-                      <Button
-                        className="rounded-full border-2 border-gray-500 bg-transparent"
-                        size={"lg"}
-                        variant="default"
-                        onPress={() => setSelectedOrder(null)}
-                      >
-                        <H5 className="text-black text-2xl">&larr;</H5>
-                      </Button>
-                      <Button
-                        onPress={() => handleViewReceipt(selectedOrder)}
-                        className="rounded-full flex-1 bg-green-700"
-                        size={"lg"}
-                        variant="default"
-                      >
-                        <H5 className="text-white">View Receipt</H5>
-                      </Button>
-                    </View>
+                    {selectedOrder?.dispatch_status === "delivered" && (
+                      <View className="flex-row gap-4 w-full justify-between mt-4">
+                        <Button
+                          className="rounded-full border-2 border-gray-500 bg-transparent"
+                          size={"lg"}
+                          variant="default"
+                          onPress={() => setSelectedOrder(null)}
+                        >
+                          <H5 className="text-black text-2xl">&larr;</H5>
+                        </Button>
+                        <Button
+                          onPress={() => handleViewReceipt(selectedOrder)}
+                          className="rounded-full flex-1 bg-green-700"
+                          size={"lg"}
+                          variant="default"
+                        >
+                          <H5 className="text-white">View Receipt</H5>
+                        </Button>
+                      </View>
+                    )}
                     {selectedOrder.dispatch_status === "delivered" ? (
                       <View className="flex-row gap-4 w-full justify-between mt-4">
                         <Button
@@ -1233,44 +1236,74 @@ export default function Page() {
             </View>
 
             <ScrollView className="flex-1 p-4 bg-white">
-              {services.map((service) => (
-                <View key={service.id} className="mb-4">
-                  {service.serviceDetails && (
-                    <>
-                      <DetailItem
-                        label="Service Name"
-                        value={service.serviceDetails.name}
-                      />
-                      <DetailItem
-                        label="Service Description"
-                        value={service.serviceDetails.description}
-                      />
-                      <View className="flex-row w-full">
-                        <View className="w-1/2">
-                          <View className="mb-4 gap-2">
-                            <H5 className="text-sm text-gray-600">
-                              {"Completion Status"}
-                            </H5>
-                            <H5
-                              className={`text-sm text-center capitalize p-2 px-4 w-3/4 rounded-full ${
-                                service.completion_status === "incomplete"
-                                  ? "bg-orange-300 text-orange-900"
-                                  : "bg-green-300 text-green-900"
-                              }`}
-                            >
-                              {service.completion_status}
-                            </H5>
+              {services.length > 0 ? (
+                services.map((service) => (
+                  <View key={service.id} className="mb-4 p-4 border-2">
+                    {service.serviceDetails && (
+                      <>
+                        <DetailItem
+                          label="Service Name"
+                          value={service.serviceDetails.name}
+                        />
+                        <DetailItem
+                          label="Service Description"
+                          value={service.serviceDetails.description}
+                        />
+                        <View className="flex-row w-full">
+                          <View className="w-full">
+                            <View className="mb-4 flex-row items-end">
+                              <View>
+                                <H5 className="text-sm text-gray-600">
+                                  {"Booked On"}
+                                </H5>
+                                <H5 className="text-base text-gray-900">
+                                  {formatDate(
+                                    service.serviceDetails.created_at
+                                  )}
+                                </H5>
+                              </View>
+                              <H5 className="text-base ml-auto text-gray-900">
+                                {formatTime(service.serviceDetails.created_at)}
+                              </H5>
+                            </View>
                           </View>
                         </View>
-                        <DetailItem
-                          label="Service Price"
-                          value={`${formatPrice(service.serviceDetails.price)}`}
-                        />
-                      </View>
-                    </>
-                  )}
+                        <View className="flex-row w-full">
+                          <View className="w-1/2">
+                            <View className="mb-4 gap-2">
+                              <H5 className="text-sm text-gray-600">
+                                {"Completion Status"}
+                              </H5>
+                              <H5
+                                className={`text-sm text-center capitalize p-2 px-4 w-3/4 rounded-full ${
+                                  service.completion_status === "incomplete"
+                                    ? "bg-orange-300 text-orange-900"
+                                    : "bg-green-300 text-green-900"
+                                }`}
+                              >
+                                {service.completion_status}
+                              </H5>
+                            </View>
+                          </View>
+                          <DetailItem
+                            label="Service Price"
+                            value={`${formatPrice(
+                              service.serviceDetails.price
+                            )}`}
+                          />
+                        </View>
+                      </>
+                    )}
+                  </View>
+                ))
+              ) : (
+                <View className="mt-10">
+                  <View className="mb-4 text-center">
+                    <H5 className="text-sm  text-center text-gray-600">{'Message'}</H5>
+                    <H5 className="text-base text-center text-gray-900">{'No Service Booked'}</H5>
+                  </View>
                 </View>
-              ))}
+              )}
             </ScrollView>
           </SafeAreaView>
         </View>
@@ -1300,7 +1333,7 @@ export default function Page() {
   const renderShippingForm = () => (
     <View className="gap-10 my-4">
       {/* ...existing form fields... */}
-      
+
       <View className="flex-row gap-4 w-full justify-between">
         <Button
           onPress={handleBackStep}

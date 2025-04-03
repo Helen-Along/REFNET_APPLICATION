@@ -143,31 +143,31 @@ export function AssignTechnicianModal({
                     }}
                     className="w-full h-48 rounded-lg mb-4"
                   />
-                  <DetailItem label="Name" value={productData.name} />
-                  <DetailItem label="Category" value={productData.category} />
+                  <DetailItem label="Name" value={productData?.name} />
+                  <DetailItem label="Category" value={productData?.category} />
                   <DetailItem
                     label="Description"
-                    value={productData.description}
+                    value={productData?.description}
                   />
                   <DetailItem
                     label="Price"
-                    value={`${formatPrice(productData.price.toFixed(2))}`}
+                    value={`${formatPrice(productData?.price.toFixed(2))}`}
                   />
                   <View className="flex-row w-full">
                     <View className="w-1/2">
                       <DetailItem
                         label="Current Stock"
                         value={
-                          productData.stock_quantity &&
-                          productData.stock_quantity.toString()
+                          productData?.stock_quantity &&
+                          productData?.stock_quantity.toString()
                         }
                       />
                     </View>
                     <DetailItem
                       label="Reorder Level"
                       value={
-                        productData.reorder_level &&
-                        productData.reorder_level.toString()
+                        productData?.reorder_level &&
+                        productData?.reorder_level.toString()
                       }
                     />
                   </View>

@@ -95,18 +95,21 @@ export default function Page() {
         .select(
           "*, services:service_id(name, description), products:product_id(*), users:customer_id(*)"
         )
-        .eq("technician_id", technicianId); // Use technicianId to fetch repairs
+        .eq("technician_id", technicianId) // Use technicianId to fetch repairs
+        .order("created_at", { ascending: false });
 
+      
       if (error) throw error;
       setRepairs(data || []);
 
+      console.log("Repairs data: >> ", data[5].status)
       // Update stats based on fetched repairs
       const assignmentCount = data.filter(
         (r) => r.status === "assigned"
       ).length;
-      const pendingCount = data.filter((r) => r.status === "pending").length;
-      const completeCount = data.filter((r) => r.status === "complete").length;
-      const redoCount = data.filter((r) => r.status === "redo").length;
+      const pendingCount = data.filter((r) => r.technician_status === "pending").length;
+      const completeCount = data.filter((r) => r.completion_status === "complete").length;
+      const redoCount = data.filter((r) => r.technician_status === "redo").length;
 
       setStats([
         {
@@ -184,11 +187,11 @@ export default function Page() {
       case "assigned":
         return repairs.filter((repair) => repair.status === "assigned");
       case "pending":
-        return repairs.filter((repair) => repair.status === "pending");
+        return repairs.filter((repair) => repair.technician_status === "pending");
       case "complete":
-        return repairs.filter((repair) => repair.status === "complete");
+        return repairs.filter((repair) => repair.completion_status === "complete");
       case "redo":
-        return repairs.filter((repair) => repair.status === "redo");
+        return repairs.filter((repair) => repair.completion_status === "redo");
       default:
         return repairs;
     }
@@ -253,7 +256,7 @@ export default function Page() {
             showsHorizontalScrollIndicator={false}
             className="flex-row gap-2"
           >
-            {["all-repairs", "assigned", "pending", "complete", "redo"].map(
+            {["all-repairs", "pending", "complete", "redo"].map(
               (sort, index) => (
                 <TouchableOpacity
                   key={index}
