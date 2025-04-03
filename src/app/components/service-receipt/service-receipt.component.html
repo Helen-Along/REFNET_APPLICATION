@@ -1,0 +1,38 @@
+<div class="receipt-container">
+  <div class="receipt-header">
+    <h2>REFNET SERVICES</h2>
+    <p class="receipt-number">Receipt #: {{receipt.receiptNumber}}</p>
+    <p class="receipt-date">Date: {{receipt.dateCreated | date}}</p>
+  </div>
+
+  <div class="customer-info">
+    <p>Customer: {{receipt.customerName}}</p>
+  </div>
+
+  <div class="services-list">
+    <table>
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let service of receipt.services">
+          <td>{{service.name}}</td>
+          <td>{{service.quantity}}</td>
+          <td>${{service.price.toFixed(2)}}</td>
+          <td>${{(service.quantity * service.price).toFixed(2)}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="receipt-footer">
+    <p class="total">Total Amount: ${{receipt.totalAmount.toFixed(2)}}</p>
+    <p class="payment-method">Payment Method: {{receipt.paymentMethod}}</p>
+    <button (click)="downloadReceipt()" class="download-btn">Download Receipt</button>
+  </div>
+</div>

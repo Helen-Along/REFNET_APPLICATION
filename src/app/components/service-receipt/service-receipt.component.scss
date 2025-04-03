@@ -1,0 +1,62 @@
+.receipt-container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: white;
+}
+
+.receipt-header {
+  text-align: center;
+  margin-bottom: 20px;
+  
+  h2 {
+    margin-bottom: 10px;
+  }
+}
+
+.customer-info {
+  margin-bottom: 20px;
+}
+
+.services-list {
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    
+    th {
+      background-color: #f5f5f5;
+    }
+  }
+}
+
+.receipt-footer {
+  text-align: right;
+  
+  .total {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .download-btn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    
+    &:hover {
+      background-color: #0056b3;
+    }
+  }
+}
