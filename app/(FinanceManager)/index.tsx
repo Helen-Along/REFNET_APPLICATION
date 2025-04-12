@@ -102,9 +102,16 @@ export default function Page() {
     "All" | "pending" | "approved"
   >("All");
   const skeletons = [0, 1, 2, 3, 4, 5, 6];
+  const [selectedRepair, setSelectedRepair] = useState(null);
+  const [restockRequests, setRestockRequests] = useState([]);
+  const [restockCurrentPage, setRestockCurrentPage] = useState(1);
+  const [restockFilterStatus, setRestockFilterStatus] = useState("All");
+  const RESTOCK_PER_PAGE = 3;
 
   useEffect(() => {
     fetchAllOrders();
+    fetchRepairs();
+    fetchRestockRequests();
     const subscription = supabase
       .channel("orders")
       .on(
@@ -328,11 +335,17 @@ export default function Page() {
 
     switch (sortBy) {
       case "pending":
-        return filteredRepairs.filter((repair) => repair.finance_status === "pending");
+        return filteredRepairs.filter(
+          (repair) => repair.finance_status === "pending"
+        );
       case "inprogress":
-        return filteredRepairs.filter((repair) => repair.finance_status === "inprogress");
+        return filteredRepairs.filter(
+          (repair) => repair.finance_status === "inprogress"
+        );
       case "completed":
-        return filteredRepairs.filter((repair) => repair.finance_status === "completed");
+        return filteredRepairs.filter(
+          (repair) => repair.finance_status === "completed"
+        );
       default:
         return filteredRepairs;
     }
@@ -394,6 +407,87 @@ export default function Page() {
   const handlePreviousPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const fetchRestockRequests = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("restock")
+        .select("*, products:product_id(*)")
+        .order("created_at", { ascending: false });
+      console.log("Restock Data: >> ", data);
+
+      if (error) throw error;
+      setRestockRequests(data || []);
+    } catch (err) {
+      console.error("Error fetching restock requests:", err);
+    }
+  };
+
+  const handleRestockApproval = async (restockId, status) => {
+    try {
+      const { error } = await supabase
+        .from("restock")
+        .update({ finance_approval: 'approved' })
+        .eq("id", restockId);
+
+      if (error) throw error;
+
+      displayNotification(`Restock request ${status}`, "success");
+      fetchRestockRequests();
+    } catch (err) {
+      Alert.alert(
+        "Error",
+        err instanceof Error ? err.message : "An unknown error occurred"
+      );
+    }
+  };
+
+   const handleRestockDecline = async (restockId, status) => {
+     try {
+       const { error } = await supabase
+         .from("restock")
+         .update({ finance_approval: "decline" })
+         .eq("id", restockId);
+
+       if (error) throw error;
+
+       displayNotification(`Restock request ${status}`, "success");
+       fetchRestockRequests();
+     } catch (err) {
+       Alert.alert(
+         "Error",
+         err instanceof Error ? err.message : "An unknown error occurred"
+       );
+     }
+   };
+
+  const getFilteredRestockRequests = () => {
+    return restockRequests.filter((request) => {
+      if (restockFilterStatus === "All") return true;
+      return request.finance_approval === restockFilterStatus.toLowerCase();
+    });
+  };
+
+  const filteredRestockRequests = getFilteredRestockRequests();
+  const paginatedRestockRequests = filteredRestockRequests.slice(
+    (restockCurrentPage - 1) * RESTOCK_PER_PAGE,
+    restockCurrentPage * RESTOCK_PER_PAGE
+  );
+  const restockTotalPages = Math.ceil(
+    filteredRestockRequests.length / RESTOCK_PER_PAGE
+  );
+
+  const handleNextRestockPage = () => {
+    if (restockCurrentPage < restockTotalPages) {
+      setRestockCurrentPage(restockCurrentPage + 1);
+    }
+  };
+
+  const handlePreviousRestockPage = () => {
+    if (restockCurrentPage > 1) {
+      setRestockCurrentPage(restockCurrentPage - 1);
     }
   };
 
@@ -665,6 +759,183 @@ export default function Page() {
                 size={"lg"}
                 onPress={handleNextServicesPage}
                 disabled={servicesCurrentPage === servicesTotalPages}
+              >
+                <H4 className="text-white text-sm">Next &rarr;</H4>
+              </Button>
+            </View>
+          )}
+        </View>
+
+        {/* Product restock approval section */}
+        <View className="bg-white p-4 mt-4">
+          <H3 className="text-black mb-4">Product Restock Requests</H3>
+
+          <View className="flex-row mb-4 gap-2">
+            <TouchableOpacity
+              className={`px-3 py-1 rounded-full ${
+                restockFilterStatus === "All" ? "bg-zinc-800" : "bg-zinc-200"
+              }`}
+              onPress={() => setRestockFilterStatus("All")}
+            >
+              <P
+                className={
+                  restockFilterStatus === "All" ? "text-white" : "text-black"
+                }
+              >
+                All
+              </P>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className={`px-3 py-1 rounded-full ${
+                restockFilterStatus === "pending"
+                  ? "bg-zinc-800"
+                  : "bg-zinc-200"
+              }`}
+              onPress={() => setRestockFilterStatus("pending")}
+            >
+              <P
+                className={
+                  restockFilterStatus === "pending"
+                    ? "text-white"
+                    : "text-black"
+                }
+              >
+                Pending
+              </P>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className={`px-3 py-1 rounded-full ${
+                restockFilterStatus === "approved"
+                  ? "bg-zinc-800"
+                  : "bg-zinc-200"
+              }`}
+              onPress={() => setRestockFilterStatus("approved")}
+            >
+              <P
+                className={
+                  restockFilterStatus === "approved"
+                    ? "text-white"
+                    : "text-black"
+                }
+              >
+                Approved
+              </P>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className={`px-3 py-1 rounded-full ${
+                restockFilterStatus === "declined"
+                  ? "bg-zinc-800"
+                  : "bg-zinc-200"
+              }`}
+              onPress={() => setRestockFilterStatus("declined")}
+            >
+              <P
+                className={
+                  restockFilterStatus === "declined"
+                    ? "text-white"
+                    : "text-black"
+                }
+              >
+                Declined
+              </P>
+            </TouchableOpacity>
+          </View>
+
+          {paginatedRestockRequests.length > 0 ? (
+            paginatedRestockRequests.map((request, index) => (
+              <View key={index} className="bg-zinc-100 rounded-lg p-4 mb-4">
+                <View className="flex-row justify-between items-center mb-2">
+                  <H4 className="text-black">
+                    {request.products?.name || "Unknown Product"}
+                  </H4>
+                  <View
+                    className={`px-2 py-1 rounded-md ${
+                      request.finance_approval === "pending"
+                        ? "bg-amber-100"
+                        : request.finance_approval === "approved"
+                        ? "bg-green-100"
+                        : "bg-red-100"
+                    }`}
+                  >
+                    <P
+                      className={`${
+                        request.finance_approval === "pending"
+                          ? "text-amber-800"
+                          : request.finance_approval === "approved"
+                          ? "text-green-800"
+                          : "text-red-800"
+                      } capitalize`}
+                    >
+                      {request.finance_approval}
+                    </P>
+                  </View>
+                </View>
+
+                <View className="mb-3">
+                  <P className="text-zinc-500">
+                    Current Stock: {request.products?.stock_quantity || 0} units
+                  </P>
+                  <P className="text-zinc-500">
+                    Requested Amount: {request.stock_amount} Units
+                  </P>
+                  <P className="text-zinc-500">
+                    Requested On:{" "}
+                    {new Date(request.created_at).toLocaleDateString()}
+                  </P>
+                </View>
+
+                {request.finance_approval === "pending" && (
+                  <View className="flex-row justify-between mt-2 gap-4">
+                    <Button
+                      variant="outline"
+                      className="bg-transparent border border-red-500 rounded-full px-6 flex-1"
+                      onPress={() =>
+                        handleRestockDecline(request.id, "declined")
+                      }
+                      size={"lg"}
+                    >
+                      <P className="text-red-500">Decline</P>
+                    </Button>
+
+                    <Button
+                      className="rounded-full flex-1 bg-green-800"
+                      onPress={() =>
+                        handleRestockApproval(request.id, "approved")
+                      }
+                      size={"lg"}
+                    >
+                      <H4 className="text-white">Approve</H4>
+                    </Button>
+                  </View>
+                )}
+              </View>
+            ))
+          ) : (
+            <View className="py-8 items-center">
+              <P className="text-zinc-500">No restock requests found</P>
+            </View>
+          )}
+
+          {paginatedRestockRequests.length > 0 && (
+            <View className="flex-row items-center justify-between my-4 w-full">
+              <Button
+                className="bg-[#111] rounded-full px-10 py-2 disabled:bg-zinc-900"
+                size={"lg"}
+                onPress={handlePreviousRestockPage}
+                disabled={restockCurrentPage === 1}
+              >
+                <H4 className="text-white text-sm">&larr; Previous</H4>
+              </Button>
+
+              <P className="text-black text-sm mx-4">
+                Page {restockCurrentPage} of {restockTotalPages}
+              </P>
+
+              <Button
+                className="bg-[#111] rounded-full px-10 py-2 disabled:bg-zinc-900"
+                size={"lg"}
+                onPress={handleNextRestockPage}
+                disabled={restockCurrentPage === restockTotalPages}
               >
                 <H4 className="text-white text-sm">Next &rarr;</H4>
               </Button>
