@@ -59,7 +59,7 @@ export default function RootLayout({navigation}: any) {
   });
 
   let fontSize = 24;
-  let paddingVertical = 6;
+  let paddingVertical = 12; // Changed from 6 to 12
 
   const { colorScheme, setColorScheme, isDarkColorScheme } = useColorScheme();
   const [isColorSchemeLoaded, setIsColorSchemeLoaded] = React.useState(false);
@@ -95,7 +95,7 @@ export default function RootLayout({navigation}: any) {
     return null;
   }
 
-  const theme = DARK_THEME ;
+  const theme = DARK_THEME;
 
   return (
     <ThemeProvider value={theme}>
@@ -113,15 +113,15 @@ export default function RootLayout({navigation}: any) {
               // options={{ headerShown: true, headerTitle: "" }}
             />
 
-            <Stack.Screen
-              name="(Customer)"
-              options={{ headerShown: false }}
-            />
+            <Stack.Screen name="(Customer)" options={{ headerShown: false }} />
             <Stack.Screen
               name="(DispatchManager)"
               options={{ headerShown: false }}
             />
-            <Stack.Screen name="(Technician)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="(Technician)"
+              options={{ headerShown: false }}
+            />
             <Stack.Screen
               name="(FinanceManager)"
               options={{ headerShown: false }}
@@ -134,7 +134,10 @@ export default function RootLayout({navigation}: any) {
               name="(StockManager)"
               options={{ headerShown: false }}
             />
-            <Stack.Screen name="(Supervisor)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="(Supervisor)"
+              options={{ headerShown: false }}
+            />
             <Stack.Screen name="(Driver)" options={{ headerShown: false }} />
             <Stack.Screen name="(Supplier)" options={{ headerShown: false }} />
             <Stack.Screen

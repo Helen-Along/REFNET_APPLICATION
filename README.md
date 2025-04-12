@@ -153,5 +153,7 @@ For any questions or support, please contact us at support@refnet.com.
 - [x] Download receipt after order is delivered
 
 ### Stock Manager Module
-- [ ] View orders and stock that has been reduced
-- [ ] Request from stock -> Finance approval -> Supplier -> Receipt
+- [x] View orders and stock that has been reduced
+- [x] Request from stock -> Finance approval -> Supplier -> Receipt
+- [ ] Rate service after completion
+- [ ] Supplier to restock product

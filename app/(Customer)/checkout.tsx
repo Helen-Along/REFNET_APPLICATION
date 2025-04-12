@@ -468,7 +468,7 @@ export default function Page() {
     </View>
   );
 
-const [paymentMethod, setPaymentMethod] = useState("card"); // Add state for payment method
+const [paymentMethod, setPaymentMethod] = useState("mpesa"); // Add state for payment method
 
 const renderPaymentForm = () => (
   <View className="gap-10">
