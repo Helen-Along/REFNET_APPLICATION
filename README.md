@@ -157,3 +157,4 @@ For any questions or support, please contact us at support@refnet.com.
 - [x] Request from stock -> Finance approval -> Supplier -> Receipt
 - [ ] Rate service after completion
 - [ ] Supplier to restock product
+- [ ] Finance Approval for services

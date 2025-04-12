@@ -31,6 +31,7 @@ import { formatBalance } from "~/lib/formatBalance";
 import { OrderCard } from "~/components/OrderCard";
 import { Button } from "~/components/ui/button";
 import { AssignTechnicianModal } from "~/components/sheets/assignTechnician";
+import displayNotification from "~/lib/Notification";
 
 type Technician = {
   id: number;
@@ -39,6 +40,7 @@ type Technician = {
 };
 
 const ORDERS_PER_PAGE = 3;
+const SERVICES_PER_PAGE = 3;
 
 export default function Page() {
   type OrderStatus = "pending" | "approved";
@@ -91,12 +93,13 @@ export default function Page() {
   ]);
   const [refreshing, setRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [servicesCurrentPage, setServicesCurrentPage] = useState(1);
   const [repairs, setRepairs] = useState<Order[]>([]);
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
   const [filterStatus, setFilterStatus] = useState<
-    "All" | "pending" | "assigned"
+    "All" | "pending" | "approved"
   >("All");
   const skeletons = [0, 1, 2, 3, 4, 5, 6];
 
@@ -301,15 +304,12 @@ export default function Page() {
     try {
       const { error } = await supabase
         .from("repairs")
-        .update({ status: "completed" })
+        .update({ finance_status: "approved" })
         .eq("id", repairId);
 
       if (error) throw error;
 
-      Alert.alert(
-        "Success",
-        "Repair has been approved and marked as completed."
-      );
+      displayNotification("Repair has been approved", "success");
       setIsModalVisible(false);
       fetchRepairs();
     } catch (err) {
@@ -321,19 +321,47 @@ export default function Page() {
   };
 
   const getSortedRepairs = () => {
+    const filteredRepairs = repairs.filter((repair) => {
+      if (filterStatus === "All") return true;
+      return repair.finance_status === filterStatus;
+    });
+
     switch (sortBy) {
       case "pending":
-        return repairs.filter((repair) => repair.status === "pending");
+        return filteredRepairs.filter((repair) => repair.finance_status === "pending");
       case "inprogress":
-        return repairs.filter((repair) => repair.status === "inprogress");
+        return filteredRepairs.filter((repair) => repair.finance_status === "inprogress");
       case "completed":
-        return repairs.filter((repair) => repair.status === "completed");
+        return filteredRepairs.filter((repair) => repair.finance_status === "completed");
       default:
-        return repairs;
+        return filteredRepairs;
     }
   };
 
   const sortedRepairs = getSortedRepairs();
+
+  const sortedServices = getSortedRepairs(); // Reusing the repairs data for services
+
+  const paginatedServices = sortedServices.slice(
+    (servicesCurrentPage - 1) * SERVICES_PER_PAGE,
+    servicesCurrentPage * SERVICES_PER_PAGE
+  );
+
+  const servicesTotalPages = Math.ceil(
+    sortedServices.length / SERVICES_PER_PAGE
+  );
+
+  const handleNextServicesPage = () => {
+    if (servicesCurrentPage < servicesTotalPages) {
+      setServicesCurrentPage(servicesCurrentPage + 1);
+    }
+  };
+
+  const handlePreviousServicesPage = () => {
+    if (servicesCurrentPage > 1) {
+      setServicesCurrentPage(servicesCurrentPage - 1);
+    }
+  };
 
   const pendingApprovalRepairs = repairs.filter((r) => r.status === "pending");
 
@@ -414,6 +442,7 @@ export default function Page() {
           </View>
         </View>
 
+        {/* Orders Section */}
         <View className="flex-row p-2 pt-4 justify-between items-center">
           <ScrollView
             horizontal
@@ -487,6 +516,160 @@ export default function Page() {
               <P className="text-white">Next &rarr;</P>
             </Button>
           </View>
+        </View>
+
+        {/* Services Section */}
+        <View className="bg-white p-4 mt-4">
+          <H3 className="text-black mb-4">Services</H3>
+
+          <View className="flex-row mb-4 gap-2">
+            <TouchableOpacity
+              className={`px-3 py-1 rounded-full ${
+                filterStatus === "All" ? "bg-zinc-800" : "bg-zinc-200"
+              }`}
+              onPress={() => setFilterStatus("All")}
+            >
+              <P
+                className={filterStatus === "All" ? "text-white" : "text-black"}
+              >
+                All
+              </P>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className={`px-3 py-1 rounded-full ${
+                filterStatus === "pending" ? "bg-zinc-800" : "bg-zinc-200"
+              }`}
+              onPress={() => setFilterStatus("pending")}
+            >
+              <P
+                className={
+                  filterStatus === "pending" ? "text-white" : "text-black"
+                }
+              >
+                Pending
+              </P>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className={`px-3 py-1 rounded-full ${
+                filterStatus === "approved" ? "bg-zinc-800" : "bg-zinc-200"
+              }`}
+              onPress={() => setFilterStatus("approved")}
+            >
+              <P
+                className={
+                  filterStatus === "approved" ? "text-white" : "text-black"
+                }
+              >
+                approved
+              </P>
+            </TouchableOpacity>
+          </View>
+
+          {paginatedServices.length > 0 ? (
+            paginatedServices.map((service, index) => (
+              <View key={index} className="bg-zinc-100 rounded-lg p-4 mb-4">
+                <View className="flex-row justify-between items-center mb-2">
+                  <H4 className="text-black">Service #{service.id}</H4>
+                  <View
+                    className={`px-2 py-1 rounded-md ${
+                      service.finance_status === "pending"
+                        ? "bg-amber-100"
+                        : service.finance_status === "inprogress"
+                        ? "bg-blue-100"
+                        : "bg-green-100"
+                    }`}
+                  >
+                    <P
+                      className={`${
+                        service.finance_status === "pending"
+                          ? "text-amber-800"
+                          : service.finance_status === "inprogress"
+                          ? "text-blue-800"
+                          : "text-green-800"
+                      } capitalize`}
+                    >
+                      {service.finance_status}
+                    </P>
+                  </View>
+                </View>
+
+                <View className="mb-2">
+                  <P className="text-zinc-500">
+                    Customer: {service.users?.full_name || "N/A"}
+                  </P>
+                  <P className="text-zinc-500">
+                    Technician:{" "}
+                    {service.technicians?.full_name || "Not approved"}
+                  </P>
+                  <P className="text-zinc-500">
+                    Product: {service.products?.name || "N/A"}
+                  </P>
+                </View>
+
+                <View className="flex-row justify-between mt-2 gap-4">
+                  <Button
+                    variant="outline"
+                    className="bg-transparent border border-zinc-300 rounded-full px-6"
+                    onPress={() => handleViewDetails(service.id)}
+                    size={"lg"}
+                  >
+                    <P className="text-black">Details</P>
+                  </Button>
+
+                  {service.finance_status === "pending" && (
+                    <Button
+                      className="rounded-full flex-1 bg-green-800"
+                      onPress={() => handleApproveRepair(service.id)}
+                      size={"lg"}
+                    >
+                      <H4 className="text-white">Approve</H4>
+                    </Button>
+                  )}
+
+                  {service.finance_approval === "pending" && (
+                    <Button
+                      className="bg-blue-600 rounded-full px-4"
+                      onPress={() =>
+                        updateFinanceStatus(service.id, "approved")
+                      }
+                    >
+                      <P className="text-white">Finance Approve</P>
+                    </Button>
+                  )}
+                </View>
+              </View>
+            ))
+          ) : (
+            <View className="py-8 items-center">
+              <P className="text-zinc-500">No services found</P>
+            </View>
+          )}
+
+          {paginatedServices.length > 0 && (
+            <View className="flex-row items-center justify-between my-4 w-full">
+              <Button
+                className="bg-[#111] rounded-full px-10 py-2 disabled:bg-zinc-900"
+                size={"lg"}
+                onPress={handlePreviousServicesPage}
+                disabled={servicesCurrentPage === 1}
+              >
+                <H4 className="text-white text-sm">&larr; Previous</H4>
+              </Button>
+
+              <P className="text-black text-sm mx-4">
+                Page {servicesCurrentPage} of {servicesTotalPages}
+              </P>
+
+              <Button
+                className="bg-[#111] rounded-full px-10 py-2 disabled:bg-zinc-900"
+                size={"lg"}
+                onPress={handleNextServicesPage}
+                disabled={servicesCurrentPage === servicesTotalPages}
+              >
+                <H4 className="text-white text-sm">Next &rarr;</H4>
+              </Button>
+            </View>
+          )}
         </View>
       </ScrollView>
     </View>
