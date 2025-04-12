@@ -38,7 +38,7 @@ type Technician = {
   speciality: string;
 };
 
-const ORDERS_PER_PAGE = 6;
+const ORDERS_PER_PAGE = 3;
 
 export default function Page() {
   type OrderStatus = "pending" | "approved";

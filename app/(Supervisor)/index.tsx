@@ -66,7 +66,8 @@ export default function Page() {
     try {
       const { data, error } = await supabase
         .from("repairs")
-        .select("*, products:product_id(*), users:technician_id(*)");
+        .select("*, products:product_id(*), users:technician_id(*)")
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       setRepairs(data || []);
@@ -96,9 +97,10 @@ export default function Page() {
       const { error } = await supabase
         .from("repairs")
         .update({ status: "completed" })
-        .eq("id", repairId);
+        .eq("id", repairId)
 
       if (error) throw error;
+      console.log(error)
 
       Alert.alert(
         "Success",

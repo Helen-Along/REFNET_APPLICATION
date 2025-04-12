@@ -1487,12 +1487,14 @@ export default function Page() {
                               </H5>
                               <H5
                                 className={`text-sm text-center capitalize p-2 px-4 w-3/4 rounded-full ${
-                                  service.completion_status === "incomplete"
+                                  service.status === "pending"
                                     ? "bg-orange-300 text-orange-900"
+                                    : service.status === "assigned"
+                                    ? "bg-purple-300 text-purple-900"
                                     : "bg-green-300 text-green-900"
                                 }`}
                               >
-                                {service.completion_status}
+                                {service.status}
                               </H5>
                             </View>
                           </View>
@@ -1503,7 +1505,7 @@ export default function Page() {
                             )}`}
                           />
                         </View>
-                        {service.completion_status === "complete" && (
+                        {service.status === "completed" && (
                           <View className="flex-row gap-4 mt-6">
                             <Button
                               onPress={() => {
