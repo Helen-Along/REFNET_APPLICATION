@@ -132,13 +132,8 @@ export default function Page() {
   const sortedRepairs = getSortedRepairs();
 
   const pendingApprovalRepairs = repairs.filter((r) => r.status === "pending");
-  const inProgressRepairs = repairs.filter((r) => r.status === "inprogress");
-  const completedToday = repairs.filter(
-    (r) =>
-      r.status === "completed" &&
-      new Date(r.estimatedCompletion).toDateString() ===
-        new Date().toDateString()
-  ).length;
+  const inProgressRepairs = repairs.filter((r) => r.status === "assigned");
+  const completedToday = repairs.filter((r) => r.status === "completed").length;
 
   const onRefresh = async () => {
     setRefreshing(true);
