@@ -128,57 +128,78 @@ export const DispatchCard: React.FC<DispatchCardProps> = ({ dispatch, onViewDeta
       </View>
 
       <View className="flex-row gap-4 w-full justify-between">
-        <Button
-          disabled={
-            dispatch.driver_status === "accepted" ||
-            dispatch.driver_status === "declined" ||
-            dispatch.driver_status === "delivered"
-          }
-          className={`rounded-full border-black bg-transparent ${
-            dispatch.driver_status === "accepted"
-              ? "border-0 p-0"
-              : dispatch.driver_status === "declined"
-              ? "border-0 p-0 px-2"
-              : dispatch.driver_status === "delivered"
-              ? "border-0 p-0 px-2"
-              : "border-2"
-          } `}
-          size={"lg"}
-          variant="default"
-          onPress={() => handleDriverStatusDecline()}
-        >
-          <H5 className=" text-black">
-            {dispatch.driver_status === "accepted"
-              ? formatDate(dispatch.updated_at)
-              : dispatch.driver_status === "declined"
-              ? "Declined"
-              : dispatch.driver_status === "delivered"
-              ? formatDate(dispatch.updated_at)
-              : "Decline"}
-          </H5>
-        </Button>
         {dispatch.driver_status === "accepted" ? (
-          <Button
-            className="rounded-full flex-1 bg-green-800 disabled:bg-zinc-900"
-            size={"lg"}
-            variant="default"
-            onPress={markAsComplete}
-          >
-            <H5 className=" text-white disabled:text-black">
-              {"Mark as Complete"}
-            </H5>
-          </Button>
+          <>
+            <Button
+              disabled={
+                dispatch.driver_status === "accepted" ||
+                dispatch.driver_status === "declined" ||
+                dispatch.driver_status === "delivered"
+              }
+              className={`rounded-full border-black bg-transparent ${
+                dispatch.driver_status === "accepted"
+                  ? "border-0 p-0"
+                  : dispatch.driver_status === "declined"
+                  ? "border-0 p-0 px-2"
+                  : dispatch.driver_status === "delivered"
+                  ? "border-0 p-0 px-2"
+                  : "border-2"
+              } `}
+              size={"lg"}
+              variant="default"
+              onPress={() => handleDriverStatusDecline()}
+            >
+              <H5 className=" text-black">
+                {dispatch.driver_status === "accepted"
+                  ? formatDate(dispatch.updated_at)
+                  : dispatch.driver_status === "declined"
+                  ? "Declined"
+                  : dispatch.driver_status === "delivered"
+                  ? formatDate(dispatch.updated_at)
+                  : "Decline"}
+              </H5>
+            </Button>
+            <Button
+              className="rounded-full flex-1 bg-green-800 disabled:bg-zinc-900"
+              size={"lg"}
+              variant="default"
+              onPress={markAsComplete}
+            >
+              <H5 className=" text-white disabled:text-black">
+                {"Mark as Delivered"}
+              </H5>
+            </Button>
+          </>
         ) : dispatch.driver_status === "delivered" ? (
           <Button
-            className="rounded-full flex-1 bg-green-800 disabled:bg-zinc-900"
+            disabled={
+              dispatch.driver_status === "accepted" ||
+              dispatch.driver_status === "declined" ||
+              dispatch.driver_status === "delivered"
+            }
+            className={`rounded-full border-black w-full text-center bg-gray-200 ${
+              dispatch.driver_status === "accepted"
+                ? "border-0 p-0"
+                : dispatch.driver_status === "declined"
+                ? "border-0 p-0 px-2"
+                : dispatch.driver_status === "delivered"
+                ? "border-0 p-0 px-2"
+                : "border-2"
+            } `}
             size={"lg"}
             variant="default"
-            onPress={markAsComplete}
-            disabled
+            onPress={() => handleDriverStatusDecline()}
           >
-            <H5 className=" text-white disabled:text-black">
-              {"Mark as Complete"}
-            </H5>
+              <H4 className=" text-black text-base">
+                Delivered on: {' '}
+              {dispatch.driver_status === "accepted"
+                ? formatDate(dispatch.updated_at)
+                : dispatch.driver_status === "declined"
+                ? "Declined"
+                : dispatch.driver_status === "delivered"
+                ? formatDate(dispatch.updated_at)
+                : "Decline"}
+            </H4>
           </Button>
         ) : (
           <DispatchDetails

@@ -654,7 +654,7 @@ const renderPaymentForm = () => (
           </Button>
           <Button
             onPress={handlePlaceOrder}
-            className="rounded-full flex-1"
+            className="rounded-full flex-1 bg-green-500"
             size={"lg"}
             variant="default"
           >
