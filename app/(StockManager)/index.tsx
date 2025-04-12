@@ -14,6 +14,7 @@ import { StatisticsCard } from "~/components/StatisticsCard";
 import { Input } from "~/components/ui/input";
 import { H3, H4, H5, P } from "~/components/ui/typography";
 import { Button } from "~/components/ui/button";
+import { ProductRestock } from "~/components/sheets/ProductRestock";
 import {
   AlertTriangle,
   GalleryVerticalEnd,
@@ -392,15 +393,22 @@ const ProductItem = ({
                     </H4>
                   </View>
                 </H4>
-                <Button
-                  className="bg-black rounded-full px-3 py-1 flex-row items-center gap-2"
-                  onPress={() => setIsEditing(true)}
-                >
-                  <PlusIcon size={18} color={"#fff"} />
-                  <Text>
-                    <P>Stock</P>
-                  </Text>
-                </Button>
+                <ProductRestock
+                  sheetTrigger={
+                    <Button
+                      className="w-max px-8 rounded-full bg-green-600"
+                      size={"lg"}
+                      variant="default"
+                    >
+                      <H4 className="text-lg text-black">
+                        Product Restock &rarr;
+                      </H4>
+                    </Button>
+                  }
+                    visible={true}
+                    product={product}
+                    dispatchId={product.dispatch_id}
+                />
               </View>
             )}
           </View>
