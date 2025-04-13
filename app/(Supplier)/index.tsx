@@ -109,11 +109,18 @@ export default function Page() {
       if (status === "accepted") {
         // Update the product's stock quantity
         const restockItem = restockItems.find((item) => item.id === id);
+        console.log(
+          "New Stock Qunatity >> ",
+          Number(restockItem.product.stock_quantity) +
+            Number(restockItem.stock_amount)
+        );
         if (restockItem) {
           const { error: updateError } = await supabase
             .from("products")
             .update({
-              stock_quantity: restockItem.product.stock_quantity + restockItem.stock_amount,
+              stock_quantity:
+                Number(restockItem.product.stock_quantity) +
+                Number(restockItem.stock_amount),
             })
             .eq("product_id", restockItem.product_id);
 
