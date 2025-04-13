@@ -140,12 +140,12 @@ export default function Screen() {
       />
       <View className="w-full mb-auto mt-auto gap-10 bg-zinc-950">
         <View className="gap-2">
-          <H1 className="text-3xl">Staff Login Page</H1>
+          <H1 className="text-3xl text-center">Staff Login Page</H1>
           <P
-            className=" color-[#b3b3b3] pr-6"
+            className=" color-[#b3b3b3] pr-6 text-center"
             style={{ fontFamily: "Inter_500Medium" }}
           >
-            Enter your email and password to login to your account
+            enter your email and password {"\n"} to login to your account
           </P>
         </View>
         <View className="w-full gap-4">
