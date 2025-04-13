@@ -193,8 +193,8 @@ export function AssignMaterialsModal({
                     }}
                     className="w-full h-48 rounded-lg mb-4"
                   /> */}
-                  <DetailItem label="Name" value={productData.name} />
-                  <DetailItem label="Category" value={productData.category} />
+                  <DetailItem label="Name" value={productData?.name} />
+                  <DetailItem label="Category" value={productData?.category} />
                   <H5 className="text-sm text-gray-600 mb-1">
                     {"Select Material"}
                   </H5>
