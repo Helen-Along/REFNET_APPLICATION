@@ -32,6 +32,7 @@ import { OrderCard } from "~/components/OrderCard";
 import { Button } from "~/components/ui/button";
 import { AssignTechnicianModal } from "~/components/sheets/assignTechnician";
 import displayNotification from "~/lib/Notification";
+import { formatTime } from "~/lib/format-time";
 
 type Technician = {
   id: number;
@@ -425,17 +426,60 @@ export default function Page() {
     }
   };
 
-  const handleRestockApproval = async (restockId, status) => {
+    const handleRestockApproval = async (restockId, status) => {
     try {
-      const { error } = await supabase
+      // First get the restock request details to calculate the cost
+      const { data: restockData, error: restockError } = await supabase
+        .from("restock")
+        .select("*, products:product_id(*)")
+        .eq("id", restockId)
+        .single();
+  
+      if (restockError) throw restockError;
+
+      
+      // Calculate total cost
+      const productPrice = restockData.products.price || 0;
+      const quantity = restockData.stock_amount || 0;
+      const totalCost = Number(productPrice) * Number(quantity);
+      
+      // Get latest balance from financial_records
+      const { data: financeData, error: financeError } = await supabase
+      .from("financial_records")
+      .select("balance")
+      .order("created_at", { ascending: false })
+      .limit(1);
+      
+      console.log("Total Cost: >> ", financeData);
+      if (financeError) throw financeError;
+      
+      const currentBalance = financeData.length > 0 ? financeData[0].balance : 0;
+      const newBalance = currentBalance - totalCost;
+      
+      // Add record to financial_records
+      const { error: recordError } = await supabase
+        .from("financial_records")
+        .insert({
+          amount: totalCost,
+          balance: newBalance,
+          payment_type: "outgoing",
+          description: `Restock of ${quantity} units of ${restockData.products.name}`,
+          employee_id: technicianId, // Add the current user's ID        });
+        })
+      if (recordError) throw recordError;
+      
+      // Update restock status
+      const { error: updateError } = await supabase
         .from("restock")
         .update({ finance_approval: 'approved' })
         .eq("id", restockId);
-
-      if (error) throw error;
-
+  
+      if (updateError) throw updateError;
+  
       displayNotification(`Restock request ${status}`, "success");
       fetchRestockRequests();
+      // Refresh finance records to update displayed balance
+      fetchAllFinancialRecords().then(response => setFinanceRecords(response));
     } catch (err) {
       Alert.alert(
         "Error",
@@ -880,7 +924,7 @@ export default function Page() {
                   </P>
                   <P className="text-zinc-500">
                     Requested On:{" "}
-                    {new Date(request.created_at).toLocaleDateString()}
+                    {new Date(request.created_at).toLocaleDateString()} - {formatTime(request.created_at)}
                   </P>
                 </View>
 

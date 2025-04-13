@@ -7,13 +7,16 @@ import {
   ActivityIndicator,
   Alert,
   RefreshControl,
+  Image,
 } from "react-native";
 import { supabase } from "~/lib/supabase";
-import { OrderItem } from "~/components/OrderItem";
 import {
   ArrowDownNarrowWide,
   Filter,
   GalleryVerticalEnd,
+  CheckCircle,
+  XCircle,
+  Package,
 } from "lucide-react-native";
 import { H1, H3, H4, P } from "~/components/ui/typography";
 import {
@@ -23,58 +26,42 @@ import {
   MessageCircle,
 } from "lucide-react-native";
 import StatsCard from "~/components/StatsCard";
-import { AssignMaterialsModal } from "~/components/sheets/assignMaterials";
-import { MaterialsItem } from "~/components/MaterialsItem";
-// import { Material } from "~/components/Material";
+import { Button } from "~/components/ui/button";
 
-type Order = {
+type RestockItem = {
   id: number;
-  service: string;
-  date: string;
-  time: string;
-  customerName: string;
-  supplier_status: "pending" | "assigned" | "completed";
-  assignedTo?: string;
-  products: any;
-};
-
-type Technician = {
-  id: number;
-  name: string;
-  speciality: string;
-};
-
-type Material = {
-  id: number;
-  name: string;
-  quantity: number;
+  product_id: number;
+  quantity_needed: number;
+  status: "pending" | "accepted" | "rejected" | "completed";
+  created_at: string;
+  product: {
+    id: number;
+    name: string;
+    description: string;
+    image_url: string;
+    price: number;
+  };
 };
 
 export default function Page() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [technicians, setTechnicians] = useState<Technician[]>([]);
+  const [restockItems, setRestockItems] = useState<RestockItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
   const [filterStatus, setFilterStatus] = useState<
-    "All" | "pending" | "assigned"
+    "All" | "pending" | "accepted" | "rejected" | "completed"
   >("All");
   const skeletons = [0, 1, 2, 3, 4, 5, 6];
   const [refreshing, setRefreshing] = useState(false);
-  const [materials, setMaterials] = useState<Material[]>([]);
-  const [selectedMaterials, setSelectedMaterials] = useState<number[]>([]);
 
   useEffect(() => {
-    fetchOrders();
-    fetchTechnicians();
-    fetchMaterials(); // Fetch materials
+    fetchRestockItems();
+
     const subscription = supabase
-      .channel("repairs")
+      .channel("restock_requests")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "orders" },
-        handleOrderChange
+        { event: "*", schema: "public", table: "restock" },
+        handleRestockChange
       )
       .subscribe();
 
@@ -83,19 +70,17 @@ export default function Page() {
     };
   }, []);
 
-  const fetchOrders = async () => {
+  const fetchRestockItems = async () => {
     setIsLoading(true);
     setError(null);
     try {
       const { data, error } = await supabase
-        .from("repairs")
-        .select(
-          "*, services(*), users:customer_id(full_name), products:product_id(*), technicians:technician_id(full_name)"
-        )
+        .from("restock")
+        .select("*, product:product_id(*)")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setOrders(data || []);
+      setRestockItems(data || []);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An unknown error occurred"
@@ -105,62 +90,39 @@ export default function Page() {
     }
   };
 
-  const fetchTechnicians = async () => {
+  const handleRestockChange = (payload: any) => {
+    fetchRestockItems();
+  };
+
+  const updateRestockStatus = async (id: number, status: string) => {
     try {
-      const { data, error } = await supabase
-        .from("technicians")
-        .select("*, users:user_id(username)");
-
-      if (error) throw error;
-      setTechnicians(data || []);
-    } catch (err) {
-      console.error("Error fetching technicians:", err);
-    }
-  };
-
-  const fetchMaterials = async () => {
-    try {
-      const { data, error } = await supabase.from("materials").select("*");
-      if (error) throw error;
-      setMaterials(data || []);
-      console.log('Fetching materials: ', data)
-    } catch (err) {
-      console.error("Error fetching materials:", err);
-    }
-  };
-
-  const handleOrderChange = (payload: any) => {
-    fetchOrders();
-  };
-
-  const handleAssign = (orderId: number) => {
-    setSelectedOrderId(orderId);
-    setModalVisible(true);
-  };
-
-  const assignTechnician = async (technicianId: number) => {
-    if (!selectedOrderId) return;
-
-    try {
-      const technician = technicians.find((t) => t.id === technicianId);
-      if (!technician) throw new Error("Technician not found");
-
       const { error } = await supabase
-        .from("repairs")
-        .update({
-          status: "assigned",
-          assignedTo: technician.name,
-          materials_assigned: selectedMaterials,
-          supplier_status: "supplied",
-        })
-        .eq("id", selectedOrderId);
+        .from("restock")
+        .update({ status })
+        .eq("id", id);
 
       if (error) throw error;
 
-      setModalVisible(false);
-      setSelectedOrderId(null);
-      setSelectedMaterials([]);
-      Alert.alert("Success", "Technician assigned and materials supplied successfully");
+      // If marking as accepted, we might also want to update inventory
+      if (status === "accepted") {
+        // Update the product's stock quantity
+        const restockItem = restockItems.find((item) => item.id === id);
+        if (restockItem) {
+          const { error: updateError } = await supabase
+            .from("products")
+            .update({
+              stock_quantity: restockItem.product.stock_quantity + restockItem.quantity_needed,
+            })
+            .eq("product_id", restockItem.product_id);
+
+          if (updateError) {
+            throw updateError;
+          }
+        }
+      }
+
+      Alert.alert("Success", `Restock request ${status} successfully`);
+      fetchRestockItems();
     } catch (err) {
       Alert.alert(
         "Error",
@@ -169,59 +131,51 @@ export default function Page() {
     }
   };
 
-  const handleMaterialSelect = (materialId: number) => {
-    setSelectedMaterials((prev) =>
-      prev.includes(materialId)
-        ? prev.filter((id) => id !== materialId)
-        : [...prev, materialId]
-    );
-  };
-
-  const filteredOrders = orders.filter((order) => {
+  const filteredRestockItems = restockItems.filter((item) => {
     if (filterStatus === "All") return true;
-    return order.supplier_status === filterStatus;
+    return item.status === filterStatus;
   });
 
-  const calculateStats = (orders: Order[]) => {
+  const calculateStats = (items: RestockItem[]) => {
     return [
       {
         iconBgColor: "bg-blue-600",
-        Icon: <GalleryVertical color="white" size={19} />,
-        Title: "Total Orders",
-        Description: `${orders.length} orders`,
+        Icon: <Package color="white" size={19} />,
+        Title: "Total Requests",
+        Description: `${items.length} items`,
       },
       {
         iconBgColor: "bg-orange-600",
         Icon: <ListTodo color="white" size={19} />,
         Title: "Pending",
         Description: `${
-          orders.filter((o) => o.supplier_status === "pending").length
-        } orders`,
+          items.filter((i) => i.status === "pending").length
+        } items`,
       },
       {
         iconBgColor: "bg-green-600",
-        Icon: <ListChecks color="white" size={19} />,
-        Title: "Assigned",
+        Icon: <CheckCircle color="white" size={19} />,
+        Title: "Accepted",
         Description: `${
-          orders.filter((o) => o.supplier_status === "assigned").length
-        } orders`,
+          items.filter((i) => i.status === "accepted").length
+        } items`,
       },
       {
         iconBgColor: "bg-purple-600",
         Icon: <MessageCircle color="white" size={19} />,
         Title: "Completed",
         Description: `${
-          orders.filter((o) => o.supplier_status === "completed").length
-        } orders`,
+          items.filter((i) => i.status === "completed").length
+        } items`,
       },
     ];
   };
 
-  const stats = calculateStats(orders);
+  const stats = calculateStats(restockItems);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchOrders();
+    await fetchRestockItems();
     setRefreshing(false);
   };
 
@@ -231,13 +185,82 @@ export default function Page() {
         <Text className="text-red-500 text-lg">{error}</Text>
         <TouchableOpacity
           className="mt-4 bg-blue-500 px-4 py-2 rounded-lg"
-          onPress={fetchOrders}
+          onPress={fetchRestockItems}
         >
           <Text className="text-white font-bold">Retry</Text>
         </TouchableOpacity>
       </View>
     );
   }
+
+  const RestockItemCard = ({ item }: { item: RestockItem }) => {
+    return (
+      <View className="bg-zinc-900 p-4 rounded-lg">
+        <View className="flex-row">
+          <Image
+            source={{ uri: item.product.image_url }}
+            className="w-24 h-24 rounded-md"
+            resizeMode="cover"
+          />
+          <View className="flex-1 ml-4">
+            <H3 className="text-white">{item.product.name}</H3>
+            <P className="text-gray-400 mt-1">{item.product.description}</P>
+            <View className="flex-row items-center mt-2">
+              <Text className="text-white font-bold">Quantity needed: </Text>
+              <Text className="text-white">{item.quantity_needed}</Text>
+            </View>
+            <View className="flex-row items-center mt-1">
+              <Text className="text-white font-bold">Status: </Text>
+              <Text
+                className={`capitalize ${
+                  item.status === "accepted"
+                    ? "text-green-500"
+                    : item.status === "rejected"
+                    ? "text-red-500"
+                    : item.status === "completed"
+                    ? "text-blue-500"
+                    : "text-yellow-500"
+                }`}
+              >
+                {item.status}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <View className="flex-row justify-end mt-4 gap-2">
+          {item.status === "pending" && (
+            <>
+              <TouchableOpacity
+                className="bg-green-600 py-2 px-4 rounded-lg flex-row items-center"
+                onPress={() => updateRestockStatus(item.id, "accepted")}
+              >
+                <CheckCircle size={16} color="white" />
+                <Text className="text-white ml-2">Accept</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="bg-red-600 py-2 px-4 rounded-lg flex-row items-center"
+                onPress={() => updateRestockStatus(item.id, "rejected")}
+              >
+                <XCircle size={16} color="white" />
+                <Text className="text-white ml-2">Reject</Text>
+              </TouchableOpacity>
+            </>
+          )}
+
+          {item.status === "accepted" && (
+            <TouchableOpacity
+              className="bg-blue-600 py-2 px-4 rounded-lg flex-row items-center"
+              onPress={() => updateRestockStatus(item.id, "completed")}
+            >
+              <CheckCircle size={16} color="white" />
+              <Text className="text-white ml-2">Mark Complete</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+    );
+  };
 
   return (
     <View className="flex-1">
@@ -248,7 +271,7 @@ export default function Page() {
         }
       >
         <View className="bg-white p-4 gap-6">
-          <H3 className="text-black">Statistics</H3>
+          <H3 className="text-black">Restock Statistics</H3>
           <View className="flex-row flex-wrap gap-y-6 justify-between">
             {stats.map((stat, index) => (
               <StatsCard
@@ -269,43 +292,51 @@ export default function Page() {
               showsHorizontalScrollIndicator={false}
               className="flex-row gap-2"
             >
-              {(["All", "pending", "assigned"] as const).map(
-                (status, index) => (
-                  <TouchableOpacity
-                    key={status}
-                    className={`px-3 pb-2 border-b-2 flex-row items-center ${
-                      filterStatus === status
-                        ? "border-white"
-                        : "border-zinc-900"
+              {(
+                ["All", "pending", "accepted", "rejected", "completed"] as const
+              ).map((status, index) => (
+                <TouchableOpacity
+                  key={status}
+                  className={`px-3 pb-2 border-b-2 flex-row items-center ${
+                    filterStatus === status ? "border-white" : "border-zinc-900"
+                  }`}
+                  onPress={() => setFilterStatus(status)}
+                >
+                  {status === "All" ? (
+                    <GalleryVerticalEnd
+                      size={16}
+                      color={filterStatus === status ? "#fff" : "#3f3f46"}
+                    />
+                  ) : status === "pending" ? (
+                    <ListTodo
+                      size={16}
+                      color={filterStatus === status ? "#fff" : "#3f3f46"}
+                    />
+                  ) : status === "accepted" ? (
+                    <CheckCircle
+                      size={16}
+                      color={filterStatus === status ? "#fff" : "#3f3f46"}
+                    />
+                  ) : status === "rejected" ? (
+                    <XCircle
+                      size={16}
+                      color={filterStatus === status ? "#fff" : "#3f3f46"}
+                    />
+                  ) : (
+                    <ListChecks
+                      size={16}
+                      color={filterStatus === status ? "#fff" : "#3f3f46"}
+                    />
+                  )}
+                  <H4
+                    className={`capitalize text-lg px-2 ${
+                      filterStatus === status ? "text-white" : "text-zinc-700"
                     }`}
-                    onPress={() => setFilterStatus(status)}
                   >
-                    {status === "All" ? (
-                      <GalleryVerticalEnd
-                        size={16}
-                        color={filterStatus === status ? "#fff" : "#3f3f46"}
-                      />
-                    ) : status === "pending" ? (
-                      <ListTodo
-                        size={16}
-                        color={filterStatus === status ? "#fff" : "#3f3f46"}
-                      />
-                    ) : (
-                      <ListChecks
-                        size={16}
-                        color={filterStatus === status ? "#fff" : "#3f3f46"}
-                      />
-                    )}
-                    <H4
-                      className={`capitalize text-lg px-2 ${
-                        filterStatus === status ? "text-white" : "text-zinc-700"
-                      }`}
-                    >
-                      {status === "All" ? "All Requests" : status}
-                    </H4>
-                  </TouchableOpacity>
-                )
-              )}
+                    {status === "All" ? "All Requests" : status}
+                  </H4>
+                </TouchableOpacity>
+              ))}
             </ScrollView>
           </View>
         </View>
@@ -319,27 +350,15 @@ export default function Page() {
                   key={index}
                 />
               ))
-            ) : filteredOrders.length === 0 ? (
+            ) : filteredRestockItems.length === 0 ? (
               <View className="p-4">
                 <H1 className="text-white !text-[40px]">
                   No results {"\n"}Found
                 </H1>
               </View>
             ) : (
-              filteredOrders.map((order, index) => (
-                <AssignMaterialsModal
-                  key={index}
-                  sheetTrigger={
-                    <MaterialsItem order={order} onAssign={handleAssign} />
-                  }
-                  visible={modalVisible && selectedOrderId === order.id}
-                  product={order.products}
-                  repair={order}
-                  materials={materials} // Pass materials to the modal
-                  selectedMaterials={selectedMaterials}
-                  onMaterialSelect={handleMaterialSelect}
-                  onAssign={(technicianId) => assignTechnician(technicianId)}
-                />
+              filteredRestockItems.map((item, index) => (
+                <RestockItemCard key={index} item={item} />
               ))
             )}
           </View>

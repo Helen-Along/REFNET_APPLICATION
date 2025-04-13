@@ -48,6 +48,114 @@ const LOW_STOCK_THRESHOLD = 10;
 const OPTIMAL_STOCK_THRESHOLD = 50;
 const PRODUCTS_PER_PAGE = 6;
 
+const ProductItem = ({ product, onUpdateQuantity }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [newQuantity, setNewQuantity] = useState(
+    product.stock_quantity.toString()
+  );
+  const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
+  const [showRestockSheet, setShowRestockSheet] = useState(false);
+
+  const handleUpdate = () => {
+    const updatedQuantity = parseInt(newQuantity);
+    if (isNaN(updatedQuantity) || updatedQuantity < 0) {
+      Alert.alert("Invalid Input", "Please enter a valid number for quantity.");
+      return;
+    }
+    onUpdateQuantity(product.product_id, updatedQuantity);
+    setIsEditing(false);
+  };
+
+  const isLowStock = product.stock_quantity < 10;
+
+  return (
+    <View className="bg-white shadow-sm mb-3 p-4">
+      <View className="flex-row gap-4">
+        <View className="flex-1">
+          <H3 className="text-lg text-gray-800">{product.name}</H3>
+          <P className="text-sm text-gray-600 line-clamp-3">
+            {product.description}
+          </P>
+          <Image
+            source={{
+              uri: product.image_url.replace(/^http:\/\//i, "https://"),
+            }}
+            className="w-full h-48 rounded-lg mt-6 border"
+            style={{ objectFit: "cover" }}
+          />
+          <View className="flex-row items-center mt-8">
+            {isEditing ? (
+              <View className="flex-row gap-2 items-center justify-between w-full">
+                <Input
+                  className="bg-transparent border outline-none text-black w-1/2 rounded-full px-4"
+                  value={newQuantity}
+                  onChangeText={setNewQuantity}
+                  keyboardType="numeric"
+                  maxLength={4}
+                  autoFocus
+                />
+                <View className="flex-row gap-2 items-center flex-1">
+                  <Button
+                    className="bg-blue-500 rounded-full"
+                    size={"default"}
+                    onPress={handleUpdate}
+                  >
+                    <P className="text-white">Save</P>
+                  </Button>
+                  <Button
+                    className="bg-black rounded-full px-3 py-1"
+                    size={"default"}
+                    onPress={() => setIsEditing(false)}
+                  >
+                    <P className="text-white">Cancel</P>
+                  </Button>
+                </View>
+              </View>
+            ) : (
+              <View className="flex-row items-center justify-between w-full">
+                <H4
+                  className={`text-base mr-2 flex items-center ${
+                    isLowStock ? "text-red-500" : "text-yellow-700"
+                  }`}
+                >
+                  <View className="flex-row items-center gap-2">
+                    {isLowStock && <AlertTriangle size={14} color="#ef4444" />}
+                    <H4
+                      className={`text-lg ${
+                        isLowStock ? "text-red-500" : "text-black"
+                      }`}
+                    >
+                      {isLowStock
+                        ? `Limited Stock: ${product.stock_quantity}`
+                        : `In Stock: ${product.stock_quantity}`}
+                    </H4>
+                  </View>
+                </H4>
+                <ProductRestock
+                  sheetTrigger={
+                    <Button
+                      className="w-max px-8 rounded-full bg-green-600"
+                      size={"lg"}
+                      variant="default"
+                    >
+                      <H4 className="text-lg text-black">
+                        Product Restock &rarr;
+                      </H4>
+                    </Button>
+                  }
+                  visible={showRestockSheet}
+                  onClose={() => setShowRestockSheet(false)}
+                  product={product}
+                />
+              </View>
+            )}
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+};
+
 export default function Page() {
   const [products, setProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -302,118 +410,5 @@ export default function Page() {
         </View>
       </View>
     </ScrollView>
-  );
-};
-
-const ProductItem = ({
-  product,
-  onUpdateQuantity,
-}: {
-  product: Product;
-  onUpdateQuantity: (id: number, newQuantity: number) => void;
-}) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [newQuantity, setNewQuantity] = useState(
-    product.stock_quantity.toString()
-  );
-  const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
-
-  const handleUpdate = () => {
-    const updatedQuantity = parseInt(newQuantity);
-    if (isNaN(updatedQuantity) || updatedQuantity < 0) {
-      Alert.alert("Invalid Input", "Please enter a valid number for quantity.");
-      return;
-    }
-    onUpdateQuantity(product.product_id, updatedQuantity);
-    setIsEditing(false);
-  };
-
-  const isLowStock = product.stock_quantity < 10;
-
-  return (
-    <View className="bg-white shadow-sm mb-3 p-4">
-      <View className="flex-row gap-4">
-        <View className="flex-1">
-          <H3 className="text-lg text-gray-800">{product.name}</H3>
-          <P className="text-sm text-gray-600 line-clamp-3">
-            {product.description}
-          </P>
-          <Image
-            source={{
-              uri: product.image_url.replace(/^http:\/\//i, "https://"),
-            }}
-            className="w-full h-48 rounded-lg mt-6 border"
-            style={{ objectFit: "cover" }}
-          />
-          <View className="flex-row items-center mt-8">
-            {isEditing ? (
-              <View className="flex-row gap-2 items-center justify-between w-full">
-                <Input
-                  className="bg-transparent border outline-none text-black w-1/2 rounded-full px-4"
-                  value={newQuantity}
-                  onChangeText={setNewQuantity}
-                  keyboardType="numeric"
-                  maxLength={4}
-                  autoFocus
-                />
-                <View className="flex-row gap-2 items-center flex-1">
-                  <Button
-                    className="bg-blue-500 rounded-full"
-                    size={"default"}
-                    onPress={handleUpdate}
-                  >
-                    <P className="text-white">Save</P>
-                  </Button>
-                  <Button
-                    className="bg-black rounded-full px-3 py-1"
-                    size={"default"}
-                    onPress={() => setIsEditing(false)}
-                  >
-                    <P className="text-white">Cancel</P>
-                  </Button>
-                </View>
-              </View>
-            ) : (
-              <View className="flex-row items-center justify-between w-full">
-                <H4
-                  className={`text-base mr-2 flex items-center ${
-                    isLowStock ? "text-red-500" : "text-yellow-700"
-                  }`}
-                >
-                  <View className="flex-row items-center gap-2">
-                    {isLowStock && <AlertTriangle size={14} color="#ef4444" />}
-                    <H4
-                      className={`text-lg ${
-                        isLowStock ? "text-red-500" : "text-black"
-                      }`}
-                    >
-                      {isLowStock
-                        ? `Limited Stock: ${product.stock_quantity}`
-                        : `In Stock: ${product.stock_quantity}`}
-                    </H4>
-                  </View>
-                </H4>
-                <ProductRestock
-                  sheetTrigger={
-                    <Button
-                      className="w-max px-8 rounded-full bg-green-600"
-                      size={"lg"}
-                      variant="default"
-                    >
-                      <H4 className="text-lg text-black">
-                        Product Restock &rarr;
-                      </H4>
-                    </Button>
-                  }
-                    visible={true}
-                    product={product}
-                    dispatchId={product.dispatch_id}
-                />
-              </View>
-            )}
-          </View>
-        </View>
-      </View>
-    </View>
   );
 };

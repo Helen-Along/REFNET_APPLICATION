@@ -57,9 +57,6 @@ export function ProductRestock({
   sheetTrigger,
   visible,
   product,
-  dispatchId,
-  drivers,
-  onAssign,
 }: {
   sheetTrigger: React.ReactNode;
   visible: boolean;
