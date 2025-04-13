@@ -113,7 +113,7 @@ export default function Page() {
           const { error: updateError } = await supabase
             .from("products")
             .update({
-              stock_quantity: restockItem.product.stock_quantity + restockItem.quantity_needed,
+              stock_quantity: restockItem.product.stock_quantity + restockItem.stock_amount,
             })
             .eq("product_id", restockItem.product_id);
 
