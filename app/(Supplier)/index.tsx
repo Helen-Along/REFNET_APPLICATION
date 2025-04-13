@@ -27,6 +27,8 @@ import {
 } from "lucide-react-native";
 import StatsCard from "~/components/StatsCard";
 import { Button } from "~/components/ui/button";
+import { formatDate } from "~/lib/format-date";
+import { formatTime } from "~/lib/format-time";
 
 type RestockItem = {
   id: number;
@@ -204,10 +206,18 @@ export default function Page() {
           />
           <View className="flex-1 ml-4">
             <H3 className="text-white">{item.product.name}</H3>
-            <P className="text-gray-400 mt-1">{item.product.description}</P>
+            <P className="text-gray-400 mt-1 line-clamp-2">
+              {item.product.description}
+            </P>
             <View className="flex-row items-center mt-2">
               <Text className="text-white font-bold">Quantity needed: </Text>
-              <Text className="text-white">{item.quantity_needed}</Text>
+              <Text className="text-white">{item.stock_amount}</Text>
+            </View>
+            <View className="flex-row items-center mt-2">
+              <Text className="text-white font-bold">Requested on: </Text>
+              <Text className="text-white">
+                {formatDate(item.created_at)} {formatTime(item.created_at)}
+              </Text>
             </View>
             <View className="flex-row items-center mt-1">
               <Text className="text-white font-bold">Status: </Text>
