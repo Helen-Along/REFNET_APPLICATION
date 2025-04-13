@@ -32,7 +32,8 @@ export default function Layout() {
             tabBarStyle: {
               borderTopWidth: 1,
               borderTopColor: "#f1f1f1",
-              paddingBottom: 0,
+              paddingBottom: 60,
+              paddingTop: 10,
             },
             tabBarActiveTintColor: "#fff",
             tabBarInactiveTintColor: "#555555",
@@ -47,7 +48,7 @@ export default function Layout() {
               tabBarIcon: ({ color }) => (
                 <MaterialCommunityIcons
                   name="home-variant"
-                  size={28}
+                  size={32}
                   color={color}
                 />
               ),
@@ -59,7 +60,7 @@ export default function Layout() {
               tabBarIcon: ({ color }) => (
                 <Ionicons
                   name={color === "#fff" ? "search" : "search-outline"}
-                  size={28}
+                  size={32}
                   color={color}
                 />
               ),
@@ -71,7 +72,7 @@ export default function Layout() {
               tabBarIcon: ({ color }) => (
                 <Ionicons
                   name={cartQuantity > 0 ? "bag" : "bag-outline"}
-                  size={28}
+                  size={32}
                   color={color}
                 />
               ),
@@ -104,7 +105,7 @@ export default function Layout() {
             name="profile"
             options={{
               tabBarIcon: ({ color }) => (
-                <Feather name="user" size={28} color={color} />
+                <Feather name="user" size={32} color={color} />
               ),
             }}
           />

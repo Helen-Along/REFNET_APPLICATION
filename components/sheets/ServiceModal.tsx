@@ -156,9 +156,9 @@ export function ServiceModal({
               {serviceDetails?.description}
             </P>
             <View className="flex-row w-full gap-4 mt-6">
-              <View className="w-1/2">
+              <View className="flex-1">
                 <H5 className="text-sm text-white mb-2">{"Service type"}</H5>
-                <H3 className="text-base text-center rounded-full w-2/3 p-2 px-4 bg-green-300 text-green-900 leading-0 capitalize">
+                <H3 className="text-sm w-1/2 text-center rounded-full p-2 px-4 bg-green-300 text-green-900 leading-0 capitalize">
                   {serviceDetails?.service_type}
                 </H3>
               </View>

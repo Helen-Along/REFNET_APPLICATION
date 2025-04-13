@@ -23,6 +23,8 @@ import {
   Wind,
   Fan,
   Bolt,
+  Boxes,
+  Container,
 } from "lucide-react-native";
 import { H1, H2, H3, H4, H5, H6, P } from "~/components/ui/typography";
 import { Button } from "~/components/ui/button";
@@ -348,26 +350,27 @@ export default function Page() {
         <H3 className="flex-1 text-xl">Book a Service</H3>
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <View className="flex-row gap-4">
+        <View className="gap-4">
           {services.map((service) => (
             <ServiceModal
               sheetTrigger={
                 <TouchableOpacity
                   key={service.service_id}
-                  className="gap-4 w-[250px] px-2 pb-4"
+                  className="gap-4 px-4 py-8 w-screen bg-white overflow-auto"
                   // onPress={() => setSelectedServiceId(service.id)}
                 >
                   <View className="flex items-start">
                     <TouchableOpacity
-                      className={`p-2 rounded-full w-auto bg-zinc-800`}
+                      className={`p-4 rounded-full w-auto bg-zinc-800`}
                     >
-                      <Bolt size={18} color={"#fff"} />
+                      <Container size={26} color={"#fff"} />
                     </TouchableOpacity>
                   </View>
-                  <View>
-                    <H4 className="text-white">{service.name}</H4>
-                    <P className="text-zinc-400">{service.description}</P>
-                  </View>
+                  <H4 className="text-black text-xl">{service.name}</H4>
+                  <P className="text-zinc-400">{service.description}</P>
+                  <H4 className="text-green-600 text-xl mt-4">
+                    Book for Service &rarr;
+                  </H4>
                 </TouchableOpacity>
               }
               serviceId={service.service_id}
