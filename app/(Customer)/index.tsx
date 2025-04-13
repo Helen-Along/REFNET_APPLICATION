@@ -10,6 +10,7 @@ import {
   ImageBackground,
   ActivityIndicator,
   Touchable,
+  RefreshControl, // Add this import
 } from "react-native";
 import {
   ChevronRight,
@@ -42,7 +43,7 @@ import StatsCard from "~/components/StatsCard";
 import { NavigationProp } from "@react-navigation/native";
 import { formatBalance } from "~/lib/formatBalance";
 import { LinearGradient } from "expo-linear-gradient";
-import {ServiceModal} from "~/components/sheets/ServiceModal"; // Import the ServiceModal
+import { ServiceModal } from "~/components/sheets/ServiceModal"; // Import the ServiceModal
 
 const { width } = Dimensions.get("window");
 
@@ -101,6 +102,7 @@ export default function Page() {
   const [bookedServices, setBookedServices] = useState<
     Array<{ repair_id: string; customer_id: string }>
   >([]); // State to hold booked services
+  const [refreshing, setRefreshing] = useState(false); // Add this state
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -142,6 +144,34 @@ export default function Page() {
     loadProducts();
     loadServices();
   }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      // Refresh all data
+      const data = await fetchProductsFromDB();
+      setProducts(data);
+
+      const serviceData = await fetchServicesFromDB();
+      const response = await checkUser(emailContext?.email);
+      setCustomerDetails(response);
+      setBookedServices(response.booked_services || []);
+
+      const filteredServices = serviceData.filter(
+        (service) =>
+          !response.booked_services?.some(
+            (booked) =>
+              booked.repair_id === service.id &&
+              booked.customer_id === emailContext?.email
+          )
+      );
+      setServices(filteredServices);
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const paginatedProducts = products.slice(
     (currentPage - 1) * PRODUCTS_PER_PAGE,
@@ -210,7 +240,7 @@ export default function Page() {
             >
               <Image
                 source={{
-                  uri: product.image_url.replace(/^http:\/\//i, "https://"),
+                  uri: product?.image_url?.replace(/^http:\/\//i, "https://"),
                 }}
                 className="w-full h-full rounded-sm mb-2"
                 resizeMode="cover"
@@ -310,7 +340,10 @@ export default function Page() {
                 >
                   <Image
                     source={{
-                      uri: product.image_url.replace(/^http:\/\//i, "https://"),
+                      uri: product?.image_url?.replace(
+                        /^http:\/\//i,
+                        "https://"
+                      ),
                     }}
                     className="w-full rounded-tl-md h-full object-cover mix-blend-multiply bg-neutral-400"
                   />
@@ -383,7 +416,17 @@ export default function Page() {
 
   return (
     <SafeAreaView className="flex-1 bg-black">
-      <ScrollView className="flex-1">
+      <ScrollView
+        className="flex-1"
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#3b82f6"]} // Blue color for Android
+            tintColor="#3b82f6" // Blue color for iOS
+          />
+        }
+      >
         <View className="pt-16">
           <View className="px-6">
             <H2 className="text-2xl border-b-0 leading-0">

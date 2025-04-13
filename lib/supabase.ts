@@ -394,6 +394,33 @@ export async function fetchOrders() {
 // Place user orders
 export async function placeAnOrder(details: any) {
   const { data, error } = await supabase.from("orders").insert(details);
+  // Update the stock_quantity of the products ordered
+  const product_id = details.product_id;
+  const quantity = details.quantity;
+
+  const { data: product, error: fetchError } = await supabase
+    .from("products")
+    .select("stock_quantity")
+    .eq("product_id", product_id)
+    .single();
+
+  if (fetchError) {
+    console.error(`Error fetching product with ID ${product_id}:`, fetchError);
+  }
+
+  const updatedStock = product.stock_quantity - quantity;
+
+  const { error: updateError } = await supabase
+    .from("products")
+    .update({ stock_quantity: updatedStock })
+    .eq("product_id", product_id);
+
+  if (updateError) {
+    console.error(
+      `Error updating stock for product ID ${product_id}:`,
+      updateError
+    );
+  }
 
   if (error) {
     return `Error: ${error.message || JSON.stringify(error)}`;
