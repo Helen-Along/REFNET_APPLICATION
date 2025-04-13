@@ -128,7 +128,7 @@ export function AddProduct({
                   <Input
                     placeholder="Product Name"
                     onChangeText={setName}
-                    className="bg-transparent !h-14 text-white border-0 flex-1"
+                    className="bg-transparent  text-white border-0 flex-1"
                     autoComplete="name"
                     textContentType="name"
                     keyboardType="default"
@@ -244,7 +244,7 @@ export function AddProduct({
                     <Input
                       placeholder="001000"
                       onChangeText={setPrice}
-                      className="bg-transparent !h-14 border-0 text-white"
+                      className="bg-transparent  border-0 text-white"
                       autoComplete="off"
                       textContentType="none"
                       keyboardType="numeric"
@@ -259,7 +259,7 @@ export function AddProduct({
                     <Input
                       placeholder="0100"
                       onChangeText={setStockQuantity}
-                      className="bg-transparent !h-14 border-0 text-white"
+                      className="bg-transparent  border-0 text-white"
                       textContentType="none"
                       keyboardType="numeric"
                       maxLength={4}
@@ -273,10 +273,7 @@ export function AddProduct({
                   {imageUrl ? (
                     <Image
                       source={{
-                        uri: imageUrl.replace(
-                          /^http:\/\//i,
-                          "https://"
-                        ),
+                        uri: imageUrl.replace(/^http:\/\//i, "https://"),
                       }}
                       className="w-10 h-10 bg-white rounded-full"
                       resizeMode="cover"
@@ -287,7 +284,7 @@ export function AddProduct({
                   <Input
                     placeholder="Paste the url for the product"
                     onChangeText={setImageUrl}
-                    className="bg-transparent !h-14 text-white border-0"
+                    className="bg-transparent  text-white border-0"
                     autoComplete="name"
                     textContentType="name"
                     keyboardType="default"

@@ -71,7 +71,7 @@ export function ManageReviews({
                 onChangeText={setEmail}
                 keyboardType="email-address"
                 autoCapitalize="none"
-                className="bg-transparent !h-14"
+                className="bg-transparent "
                 style={{ fontFamily: "Inter_500Medium" }}
               />
             </View>

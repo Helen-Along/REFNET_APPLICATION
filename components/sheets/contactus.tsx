@@ -67,7 +67,7 @@ export function ContactUs({ sheetTrigger }: { sheetTrigger: React.ReactNode }) {
                 onChangeText={setEmail}
                 keyboardType="email-address"
                 autoCapitalize="none"
-                className="bg-transparent !h-14"
+                className="bg-transparent "
                 style={{ fontFamily: "Inter_500Medium" }}
               />
             </View>

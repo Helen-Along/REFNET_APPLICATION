@@ -157,7 +157,7 @@ export default function Screen() {
               onChangeText={onEmailInput}
               aria-labelledby="inputLabel"
               aria-errormessage="inputError"
-              className="bg-[#131313] border-0 !h-14 text-white"
+              className="bg-[#131313] border-0  text-white"
               autoComplete="email"
               textContentType="emailAddress"
               keyboardType="email-address"
@@ -172,7 +172,7 @@ export default function Screen() {
               onChangeText={onPasswordInput}
               aria-labelledby="inputLabel"
               aria-errormessage="inputError"
-              className="bg-[#131313] border-0 !h-14 text-white"
+              className="bg-[#131313] border-0  text-white"
               autoComplete="password"
               textContentType="password"
               secureTextEntry

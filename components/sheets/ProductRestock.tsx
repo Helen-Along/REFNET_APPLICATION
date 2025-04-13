@@ -230,7 +230,7 @@ export function ProductRestock({
                       onChangeText={onRestockInput}
                       aria-labelledby="inputLabel"
                       aria-errormessage="inputError"
-                      className="border border-zinc-400 !h-14 flex-1"
+                      className="border border-zinc-400  flex-1"
                       keyboardType="number-pad"
                       autoCapitalize="none"
                     />
