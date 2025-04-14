@@ -76,7 +76,7 @@ export const OrderCard = ({
             variant="default"
             disabled
           >
-            <H5 className="text-black text-left">
+            <H5 className="text-black text-left text-sm">
               {formatDate(order.created_at)} &#8226;{" "}
               {formatTime(order.created_at)}
             </H5>

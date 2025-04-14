@@ -33,6 +33,7 @@ import { Button } from "~/components/ui/button";
 import { AssignTechnicianModal } from "~/components/sheets/assignTechnician";
 import displayNotification from "~/lib/Notification";
 import { formatTime } from "~/lib/format-time";
+import { formatDate } from "~/lib/format-date";
 
 type Technician = {
   id: number;
@@ -742,18 +743,12 @@ export default function Page() {
                   <P className="text-zinc-500">
                     Product: {service.products?.name || "N/A"}
                   </P>
+                  <P className="text-zinc-500">
+                    Repair Date: {formatDate(service.created_at)} {formatTime(service.created_at)}
+                  </P>
                 </View>
 
                 <View className="flex-row justify-between mt-2 gap-4">
-                  <Button
-                    variant="outline"
-                    className="bg-transparent border border-zinc-300 rounded-full px-6"
-                    onPress={() => handleViewDetails(service.id)}
-                    size={"lg"}
-                  >
-                    <P className="text-black">Details</P>
-                  </Button>
-
                   {service.finance_status === "pending" && (
                     <Button
                       className="rounded-full flex-1 bg-green-800"
@@ -924,7 +919,8 @@ export default function Page() {
                   </P>
                   <P className="text-zinc-500">
                     Requested On:{" "}
-                    {new Date(request.created_at).toLocaleDateString()} - {formatTime(request.created_at)}
+                    {new Date(request.created_at).toLocaleDateString()} -{" "}
+                    {formatTime(request.created_at)}
                   </P>
                 </View>
 
