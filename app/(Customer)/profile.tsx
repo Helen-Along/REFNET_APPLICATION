@@ -37,6 +37,7 @@ import {
   fetchUserRequestedRepairs,
   fetchUserRequestedServices,
   updateOrderStatus,
+  supabase,
 } from "~/lib/supabase";
 import { formatPrice } from "~/lib/format-price";
 import displayNotification from "~/lib/Notification";
@@ -49,7 +50,7 @@ import { Services } from "~/components/sheets/manage/services";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
 import * as Print from "expo-print";
-import { formatTime } from "~/lib/format-time";
+import { formatOrderTime, formatTime } from "~/lib/format-time";
 
 interface customer {
   full_name: string;
@@ -729,14 +730,71 @@ export default function Page() {
     });
   };
 
-  const handleInitiateReturn = (orderId: string) => {
-    // TODO: Implement return initiation logic
-    displayNotification("Return request initiated", "success");
-    const order = orders.find((order) => order.id === orderId);
-    if (order) {
-      printReceipt(order);
+    const handleInitiateReturn = async (orderId: string) => {
+    try {
+      // First get the order details to access the product_id and quantity
+      const { data: orderData, error: orderError } = await supabase
+        .from("orders")
+        .select("*, products(*)")
+        .eq("order_id", orderId)
+        .single();
+  
+      if (orderError) {
+        throw orderError;
+      }
+  
+      // Get the quantity from the order
+      const returnQuantity = orderData.quantity;
+      const productId = orderData.product_id;
+  
+      // Update the order status
+      const { error: updateError } = await supabase
+        .from("orders")
+        .update({ status: "returned", dispatch_status: 'returned' })
+        .eq("order_id", orderId);
+  
+      if (updateError) {
+        throw updateError;
+      }
+  
+      // Increment the product stock quantity
+      const { error: productError } = await supabase.rpc('increment_stock', {
+        p_product_id: productId,
+        p_quantity: returnQuantity
+      });
+  
+      // Alternative direct update if RPC function doesn't exist
+      if (productError) {
+        // Get current stock quantity
+        const { data: productData, error: getProductError } = await supabase
+          .from("products")
+          .select("stock_quantity")
+          .eq("product_id", productId)
+          .single();
+  
+        if (getProductError) {
+          throw getProductError;
+        }
+  
+        // Update stock quantity
+        const { error: stockUpdateError } = await supabase
+          .from("products")
+          .update({
+            stock_quantity: productData.stock_quantity + returnQuantity
+          })
+          .eq("product_id", productId);
+  
+        if (stockUpdateError) {
+          throw stockUpdateError;
+        }
+      }
+  
+      displayNotification("Return request initiated", "success");
+      setSelectedOrder(null);
+    } catch (err) {
+      console.error("Error requesting return for order:", err);
+      displayNotification("Failed to process return", "error");
     }
-    setSelectedOrder(null);
   };
 
   const handleSubmitReview = async (order: any) => {
@@ -935,68 +993,81 @@ export default function Page() {
                         <H5 className="text-sm text-gray-600">
                           {"Delivery Status"}
                         </H5>
-                        <View className="flex-row items-center justify-around">
-                          <View className="flex-row items-center gap-2">
-                            <View
-                              className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                                selectedOrder.dispatch_status === "pending"
-                                  ? "bg-green-500"
-                                  : "!bg-[#2c2c2c]"
-                              }`}
-                            >
-                              <P> 1 </P>
+                        {selectedOrder.status === "returned" ? (
+                          <Button
+                            className={'rounded-full border-[1px] border-zinc-600 bg-transparent'}
+                            size={"lg"}
+                            variant="default"
+                          >
+                            <H5 className="text-zinc-600">{"Order Returned"}</H5>
+                          </Button>
+                        ) : (
+                          <View className="flex-row items-center justify-around">
+                            <View className="flex-row items-center gap-2">
+                              <View
+                                className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                                  selectedOrder.dispatch_status === "pending"
+                                    ? "bg-green-500"
+                                    : "!bg-[#2c2c2c]"
+                                }`}
+                              >
+                                <P className="text-sm"> 1 </P>
+                              </View>
+                              <H4
+                                className={`text-lg capitalize ${
+                                  selectedOrder.dispatch_status === "pending"
+                                    ? "text-gray-900"
+                                    : "text-gray-500"
+                                }`}
+                              >
+                                Verification
+                              </H4>
                             </View>
-                            <H4
-                              className={`text-lg capitalize ${
-                                selectedOrder.dispatch_status === "pending"
-                                  ? "text-gray-900"
-                                  : "text-gray-500"
-                              }`}
-                            >
-                              Verification
-                            </H4>
-                          </View>
-                          <View className="flex-row items-center gap-2">
-                            <View
-                              className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                                selectedOrder.dispatch_status === "dispatched"
-                                  ? "bg-green-500"
-                                  : "!bg-[#6b7280]"
-                              }`}
-                            >
-                              <P> 2 </P>
+                            <View className="flex-row items-center gap-2">
+                              <View
+                                className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                                  selectedOrder.dispatch_status === "dispatched"
+                                    ? "bg-green-500"
+                                    : "!bg-[#6b7280]"
+                                }`}
+                              >
+                                <P className="text-sm"> 2 </P>
+                              </View>
+                              <H4
+                                className={`text-lg capitalize ${
+                                  selectedOrder.dispatch_status === "dispatched"
+                                    ? "text-gray-900"
+                                    : "text-gray-500"
+                                }`}
+                              >
+                                In Transit
+                              </H4>
                             </View>
-                            <H4
-                              className={`text-lg capitalize ${
-                                selectedOrder.dispatch_status === "dispatched"
-                                  ? "text-gray-900"
-                                  : "text-gray-500"
-                              }`}
-                            >
-                              In Transit
-                            </H4>
-                          </View>
-                          <View className="flex-row items-center gap-2">
-                            <View
-                              className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                                selectedOrder.dispatch_status === "delivered"
-                                  ? "bg-green-500"
-                                  : "!bg-[#6b7280]"
-                              }`}
-                            >
-                              <P> 3 </P>
+                            <View className="flex-row items-center gap-2">
+                              <View>
+                                <P
+                                  className={`px-2 text-sm rounded-full flex items-center justify-center ${
+                                    selectedOrder.dispatch_status ===
+                                    "delivered"
+                                      ? "bg-green-500"
+                                      : "!bg-[#6b7280]"
+                                  }`}
+                                >
+                                  3
+                                </P>
+                              </View>
+                              <H4
+                                className={`text-lg capitalize ${
+                                  selectedOrder.dispatch_status === "delivered"
+                                    ? "text-gray-900"
+                                    : "text-gray-500"
+                                }`}
+                              >
+                                Delivered
+                              </H4>
                             </View>
-                            <H4
-                              className={`text-lg capitalize ${
-                                selectedOrder.dispatch_status === "delivered"
-                                  ? "text-gray-900"
-                                  : "text-gray-500"
-                              }`}
-                            >
-                              Delivered
-                            </H4>
                           </View>
-                        </View>
+                        )}
                       </View>
                       <View className="flex-row w-full items-center mt-6">
                         <H5 className="text-sm text-gray-600 w-1/2">
@@ -1016,7 +1087,7 @@ export default function Page() {
                       </View>
                     )}
 
-                    {selectedOrder.status === "delivered" && (
+                    {/* {selectedOrder.status === "delivered" && (
                       <Button
                         variant="outline"
                         className="mt-4"
@@ -1026,7 +1097,7 @@ export default function Page() {
                       >
                         <P className="uppercase text-black">Initiate Return</P>
                       </Button>
-                    )}
+                    )} */}
                     {selectedOrder?.dispatch_status === "delivered" && (
                       <View className="flex-row gap-4 w-full justify-between mt-4">
                         <Button
@@ -1039,7 +1110,10 @@ export default function Page() {
                         </Button>
                         <Button
                           onPress={() => {
-                            const orderReceipt = generateReceipt(selectedOrder, customer);
+                            const orderReceipt = generateReceipt(
+                              selectedOrder,
+                              customer
+                            );
                             downloadReceipt(orderReceipt);
                           }}
                           className="rounded-full flex-1 bg-green-700"
@@ -1053,34 +1127,9 @@ export default function Page() {
                     {selectedOrder.dispatch_status === "delivered" ? (
                       <View className="flex-row gap-4 w-full justify-between mt-4">
                         <Button
-                          onPress={async () => {
-                            try {
-                              const updatedOrder = {
-                                ...selectedOrder,
-                                status: "returned",
-                                dispatch_status: "returned",
-                              };
-                              // Assuming you have a function to update the order in the database
-                              await updateOrderStatus(
-                                selectedOrder.order_id,
-                                updatedOrder
-                              );
-                              displayNotification(
-                                "Return request submitted successfully",
-                                "success"
-                              );
-                              setSelectedOrder(updatedOrder);
-                            } catch (error) {
-                              console.error(
-                                "Error updating order status:",
-                                error
-                              );
-                              displayNotification(
-                                "Failed to submit return request",
-                                "error"
-                              );
-                            }
-                          }}
+                          onPress={() =>
+                            handleInitiateReturn(selectedOrder.order_id)
+                          }
                           className="rounded-full border-2 border-gray-500 bg-transparent"
                           size={"lg"}
                           variant="default"
@@ -1116,9 +1165,11 @@ export default function Page() {
                           {/* <H4 className="text-lg text-gray-800">
                             Order #{order.order_id}
                           </H4> */}
-                           <DetailItem
+                          <DetailItem
                             label="Date Ordered"
-                            value={`${formatDate(order.order_date)} - ${formatTime(order.order_date)}`}
+                            value={`${formatDate(
+                              order.order_date
+                            )} - ${formatOrderTime(order.order_date)}`}
                           />
                         </View>
                       </View>
