@@ -222,7 +222,7 @@ export function OrderDetailsModal({
                             order.payment_status === "pending"
                               ? "text-orange-900 bg-orange-50"
                               : "text-green-900 bg-green-50"
-                          } w-32 text-base text-center capitalize p-2 px-4 rounded-full`}
+                          } w-32 text-sm text-center capitalize p-2 px-4 rounded-full`}
                         >
                           {productData.payment_status || "N/A"}
                         </H5>
@@ -239,7 +239,7 @@ export function OrderDetailsModal({
                             productData.finance_approval === "declined"
                             ? "text-red-900 bg-red-50"
                             : "text-green-900 bg-green-50"
-                        } text-base text-center capitalize p-2 px-4 rounded-full`}
+                        } text-sm text-center capitalize p-2 px-4 rounded-full`}
                       >
                         {productData.finance_approval || "N/A"}
                       </H5>

@@ -155,6 +155,7 @@ For any questions or support, please contact us at support@refnet.com.
 ### Stock Manager Module
 - [x] View orders and stock that has been reduced
 - [x] Request from stock -> Finance approval -> Supplier -> Receipt
-- [ ] Rate service after completion
-- [ ] Supplier to restock product
-- [ ] Finance Approval for services
+- [x] Rate service after completion
+- [x] Supplier to restock product
+- [x] Finance Approval for services
+- [x] Fix time issues

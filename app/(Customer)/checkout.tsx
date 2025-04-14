@@ -545,7 +545,8 @@ const renderPaymentForm = () => (
                 setPaymentInfo({ ...paymentInfo, mpesaNumber: text })
               }
               {...getFieldError("mpesaNumber")}
-              className="border-0 flex-1"
+                className="border-0 flex-1"
+                keyboardType='number-pad'
               maxLength={10}
             />
           </View>

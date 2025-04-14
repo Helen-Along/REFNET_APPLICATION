@@ -1113,15 +1113,16 @@ export default function Page() {
                     >
                       <View className="flex-row justify-between items-center">
                         <View>
-                          <H4 className="text-lg text-gray-800">
+                          {/* <H4 className="text-lg text-gray-800">
                             Order #{order.order_id}
-                          </H4>
-                          <P className="text-gray-600">
-                            {formatDate(order.order_date)}
-                          </P>
+                          </H4> */}
+                           <DetailItem
+                            label="Date Ordered"
+                            value={`${formatDate(order.order_date)} - ${formatTime(order.order_date)}`}
+                          />
                         </View>
                       </View>
-                      <View className="mt-4">
+                      <View>
                         <View className="flex-row justify-between">
                           <DetailItem
                             label="Product Name"
@@ -1130,14 +1131,14 @@ export default function Page() {
                           <Image
                             source={{
                               uri:
-                                order.products.image_url ||
+                                order?.products?.image_url ||
                                 "https://placeholder.com/150",
                             }}
                             className="w-16 h-16 rounded-lg mr-4"
                           />
                         </View>
                         <View className="flex-row w-full">
-                          <View className="w-1/3">
+                          <View className="w-1/2">
                             <DetailItem
                               label="Price"
                               value={formatPrice(order.unit_price)}
