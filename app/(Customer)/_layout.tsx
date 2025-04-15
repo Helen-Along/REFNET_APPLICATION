@@ -14,7 +14,7 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { useCart } from "~/lib/cart-context";
 import { ArrowLeft, BackpackIcon } from "lucide-react-native";
 import { TouchableOpacity, View } from "react-native";
-import { H2, H4, P } from "~/components/ui/typography";
+import { H2, H3, H4, P } from "~/components/ui/typography";
 import { useRouter, useNavigation } from "expo-router";
 import CustomerHome from "./index";
 
@@ -130,6 +130,17 @@ export default function Layout() {
               ),
             }}
           />
+          <Tabs.Screen
+          name="settings"
+          options={{
+            headerTitle: () => <H3>Settings</H3>,
+            tabBarIcon: ({ color }) => (
+              <FontAwesome size={28} name="cog" color={color} />
+            ),
+            headerShown: true,
+            headerStyle: { backgroundColor: "#111" },
+          }}
+        />
           <Tabs.Screen
             name="checkout"
             options={{

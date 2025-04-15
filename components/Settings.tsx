@@ -58,7 +58,7 @@ export default function SettingsScreen() {
             sheetTrigger={
               <TouchableOpacity className="flex-row w-full items-center gap-2">
                 <Contact size={16} color={"white"} />
-                <H4 className="text-base">Contact us </H4>
+                <H4 className="text-base">Contact us / Help </H4>
                 <P className="ml-auto">&rarr;</P>
               </TouchableOpacity>
             }

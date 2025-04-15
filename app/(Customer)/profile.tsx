@@ -1126,7 +1126,7 @@ export default function Page() {
                     )}
                     {selectedOrder.dispatch_status === "delivered" ? (
                       <View className="flex-row gap-4 w-full justify-between mt-4">
-                        <Button
+                        {/* <Button
                           onPress={() =>
                             handleInitiateReturn(selectedOrder.order_id)
                           }
@@ -1135,7 +1135,7 @@ export default function Page() {
                           variant="default"
                         >
                           <H5 className="text-gray-600">Request for return</H5>
-                        </Button>
+                        </Button> */}
                         <Button
                           onPress={() => {
                             setActiveModal("review");
@@ -1521,12 +1521,12 @@ export default function Page() {
                                 </H5>
                                 <H5 className="text-base text-gray-900">
                                   {formatDate(
-                                    service.serviceDetails.created_at
+                                    service.created_at
                                   )}
                                 </H5>
                               </View>
                               <H5 className="text-base ml-auto text-gray-900">
-                                {formatTime(service.serviceDetails.created_at)}
+                                {formatTime(service.created_at)}
                               </H5>
                             </View>
                           </View>
